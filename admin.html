@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AR INFOTECH — Master Admin Command Center</title>
+  <link rel="icon" type="image/png" href="./assets/images/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================================================
+       AR INFOTECH ADMIN LIGHT THEME SYSTEM
+       ========================================================================== */
+    :root {
+      --bg-body: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --bg-hover: #f1f5f9;
+      --border: #e2e8f0;
+      --border-darker: #cbd5e1;
+      --border-focus: #0052cc;
+      --primary: #0052cc;
+      --primary-hover: #0747a6;
+      --primary-subtle: #eff6ff;
+      --primary-glow: rgba(0, 82, 204, 0.18);
+      --cyan: #0284c7;
+      --cyan-subtle: #f0f9ff;
+      --success: #10b981;
+      --success-subtle: #ecfdf5;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --danger-subtle: #fef2f2;
+      --text-main: #0f172a;
+      --text-sub: #334155;
+      --text-muted: #64748b;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-body);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-body); }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Login Screen - Light Corporate Theme */
+    #login-view {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: 
+        radial-gradient(circle at 50% 15%, #e0f2fe 0%, transparent 60%),
+        radial-gradient(circle at 80% 80%, #f0fdf4 0%, transparent 50%),
+        var(--bg-body);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2.25rem;
+      box-shadow: var(--shadow-lg), 0 20px 40px rgba(0, 82, 204, 0.08);
+      text-align: center;
+    }
+
+    .login-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .login-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--primary-subtle);
+      border: 1px solid rgba(0, 82, 204, 0.15);
+      padding: 5px;
+      object-fit: contain;
+    }
+
+    .login-brand-text h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+      text-align: left;
+    }
+
+    .login-brand-text p {
+      font-size: 0.75rem;
+      color: var(--primary);
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      text-align: left;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-control {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid var(--border-darker);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-sm {
+      padding: 0.4rem 0.85rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-success:hover { background: #059669; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-outline {
+      background: #ffffff;
+      border: 1px solid var(--border-darker);
+      color: var(--text-sub);
+    }
+    .btn-outline:hover {
+      background: var(--bg-hover);
+      color: var(--text-main);
+      border-color: #94a3b8;
+    }
+
+    /* Admin Portal Shell */
+    #admin-app {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+      background: var(--bg-body);
+    }
+
+    /* Top Navbar */
+    .admin-navbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--primary-subtle);
+      border: 1px solid rgba(0, 82, 204, 0.15);
+      padding: 4px;
+    }
+
+    .nav-titles h1 {
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.3px;
+    }
+
+    .nav-titles p {
+      font-size: 0.72rem;
+      color: var(--primary);
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 0.35rem 0.85rem;
+      border-radius: 100px;
+      background: var(--success-subtle);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #065f46;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 6px var(--success);
+    }
+
+    /* Main Layout */
+    .admin-body {
+      display: flex;
+      flex: 1;
+    }
+
+    /* Sidebar Navigation */
+    .admin-sidebar {
+      width: 255px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .sidebar-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-sub);
+      font-size: 0.88rem;
+      font-weight: 600;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-main);
+    }
+
+    .sidebar-btn.active {
+      background: var(--primary-subtle);
+      color: var(--primary);
+      font-weight: 800;
+      border-left: 4px solid var(--primary);
+    }
+
+    .sidebar-icon {
+      font-size: 1.15rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    /* Content Area */
+    .admin-content {
+      flex: 1;
+      padding: 2.25rem;
+      max-width: 1300px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pane-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pane-header h2 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .pane-header p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Grids */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+
+    @media (max-width: 1024px) {
+      .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .admin-body { flex-direction: column; }
+      .admin-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .admin-content { padding: 1.25rem; }
+    }
+
+    /* Stat Cards */
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: #cbd5e1;
+    }
+
+    .stat-card-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-card-value {
+      font-size: 2.1rem;
+      font-weight: 800;
+      margin: 0.4rem 0;
+      color: var(--primary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .stat-card-sub {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+
+    /* Management Cards */
+    .mgmt-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .mgmt-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    /* Interactive Live Framing Widget */
+    .framing-preview-box {
+      width: 130px;
+      height: 130px;
+      margin: 0 auto 1.25rem auto;
+      border-radius: 50%;
+      border: 4px solid #ffffff;
+      box-shadow: 0 8px 24px rgba(0, 82, 204, 0.16), 0 0 0 3px var(--primary);
+      overflow: hidden;
+      position: relative;
+      background: #f1f5f9;
+    }
+
+    .framing-preview-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: object-position 0.1s ease;
+    }
+
+    .slider-row {
+      background: var(--bg-body);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      margin: 1.25rem 0;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+
+    .slider-input {
+      width: 100%;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* Tables */
+    .table-wrap {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: #f8fafc;
+      padding: 1rem 1.25rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-main);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8fafc; }
+
+    .badge-status {
+      display: inline-block;
+      padding: 0.25rem 0.65rem;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .badge-new { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    .badge-contacted { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .badge-enrolled { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1.5rem;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 620px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem;
+      box-shadow: var(--shadow-lg), 0 25px 60px rgba(0, 0, 0, 0.15);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #ffffff;
+      padding: 0.85rem 1.5rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 200;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       SECRET LOGIN SCREEN (LIGHT THEME)
+       ========================================================================= -->
+  <div id="login-view">
+    <div class="login-card">
+      <div class="login-brand">
+        <img src="./assets/images/logo.png" alt="AR INFOTECH Logo" class="login-logo">
+        <div class="login-brand-text">
+          <h2>AR INFOTECH</h2>
+          <p>MASTER ADMIN CONSOLE</p>
+        </div>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.75rem; line-height: 1.5;">
+        Authenticate to manage faculty framing, live projects, admissions CRM, and certificate registry.
+      </p>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" id="login-user" class="form-control" placeholder="admin" required value="admin">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Admin Secret Password</label>
+          <input type="password" id="login-pass" class="form-control" placeholder="••••••••••••" required value="admin@arinfotech2026">
+        </div>
+        <div id="login-error" style="color: var(--danger); font-size: 0.82rem; font-weight: 700; margin-bottom: 1rem; display: none;"></div>
+        <button type="submit" class="btn btn-primary" id="login-btn" style="width: 100%;">
+          <span>🔐 Authenticate &amp; Launch Portal</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       ADMIN MASTER DASHBOARD (LIGHT THEME)
+       ========================================================================= -->
+  <div id="admin-app">
+    <!-- Navbar -->
+    <header class="admin-navbar">
+      <div class="nav-brand-wrap">
+        <img src="./assets/images/logo.png" alt="AR INFOTECH" class="nav-logo">
+        <div class="nav-titles">
+          <h1>AR INFOTECH Admin Panel</h1>
+          <p>PORTAL v2.6 • LIVE DATABASE SYNC</p>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span id="db-status-text">MongoDB Connected</span>
+        </div>
+        <a href="/" target="_blank" class="btn btn-outline btn-sm">
+          <span>🌐 View Live Site ↗</span>
+        </a>
+        <button class="btn btn-danger btn-sm" onclick="logoutAdmin()">
+          <span>🚪 Logout</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="admin-body">
+      <!-- Sidebar -->
+      <aside class="admin-sidebar">
+        <button class="sidebar-btn active" onclick="switchTab('overview')">
+          <span class="sidebar-icon">📊</span>
+          <span>Overview</span>
+        </button>
+        <button class="sidebar-btn" onclick="switchTab('trainers')">
+          <span class="sidebar-icon">👨‍🏫</span>
+          <span>Faculty &amp; Framing</span>
+        </button>
+        <button class="sidebar-btn" onclick="switchTab('projects')">
+          <span class="sidebar-icon">🚀</span>
+          <span>Software &amp; Apps</span>
+        </button>
+        <button class="sidebar-btn" onclick="switchTab('inquiries')">
+          <span class="sidebar-icon">📋</span>
+          <span>Admissions CRM</span>
+        </button>
+        <button class="sidebar-btn" onclick="switchTab('certificates')">
+          <span class="sidebar-icon">📜</span>
+          <span>Certificates</span>
+        </button>
+        <button class="sidebar-btn" onclick="switchTab('settings')">
+          <span class="sidebar-icon">⚙️</span>
+          <span>Site Settings</span>
+        </button>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="admin-content">
+
+        <!-- ==========================================
+             TAB 1: OVERVIEW
+             ========================================== -->
+        <section id="tab-overview" class="tab-pane active">
+          <div class="pane-header">
+            <div>
+              <h2>Command Center Overview</h2>
+              <p>Real-time metrics, platform health, and database synchronization</p>
+            </div>
+          </div>
+
+          <div class="grid-4" style="margin-bottom: 2rem;">
+            <div class="stat-card">
+              <div class="stat-card-title">Student Admissions / Leads</div>
+              <div class="stat-card-value" id="stat-leads-count">0</div>
+              <div class="stat-card-sub">Registered via Website</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-title">Verified Certificates</div>
+              <div class="stat-card-value" id="stat-certs-count">0</div>
+              <div class="stat-card-sub">In MongoDB Registry</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-title">Faculty Mentors</div>
+              <div class="stat-card-value" id="stat-trainers-count">4</div>
+              <div class="stat-card-sub">Dynamic Headroom Framing</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-title">Software &amp; Apps</div>
+              <div class="stat-card-value" id="stat-projects-count">5</div>
+              <div class="stat-card-sub">Live Production Apps</div>
+            </div>
+          </div>
+
+          <div class="mgmt-card">
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">⚡ Database Connection Status</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+              Live synchronization state with MongoDB server and active collections.
+            </p>
+            <div id="db-health-dump" style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; background: #f8fafc; color: #0f172a; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+              Loading health metrics...
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 2: FACULTY & FRAMING ADJUSTER
+             ========================================== -->
+        <section id="tab-trainers" class="tab-pane">
+          <div class="pane-header">
+            <div>
+              <h2>Faculty Mentors &amp; Headroom Framing</h2>
+              <p>Adjust avatar photos, live circle framing slider, titles, experience, batches, and LinkedIn links</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openAddTrainerModal()" style="width: auto;">
+              <span>➕ Add New Faculty</span>
+            </button>
+          </div>
+
+          <div class="grid-2" id="trainers-list-container">
+            <!-- Injected dynamically -->
+          </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 3: SOFTWARE LAB & PROJECTS
+             ========================================== -->
+        <section id="tab-projects" class="tab-pane">
+          <div class="pane-header">
+            <div>
+              <h2>Software Lab &amp; Production Projects</h2>
+              <p>Manage showcased applications, Google Play apps, web portals, screenshots, and live links</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openAddProjectModal()" style="width: auto;">
+              <span>➕ Add New Project</span>
+            </button>
+          </div>
+
+          <div class="grid-2" id="projects-list-container">
+            <!-- Injected dynamically -->
+          </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 4: ADMISSIONS CRM (INQUIRIES)
+             ========================================== -->
+        <section id="tab-inquiries" class="tab-pane">
+          <div class="pane-header">
+            <div>
+              <h2>Student Admissions &amp; Inquiries</h2>
+              <p>Manage incoming student registrations from the contact and demo booking forms</p>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="loadInquiries()">
+              <span>🔄 Refresh Leads</span>
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Ref ID</th>
+                  <th>Student Name</th>
+                  <th>Contact Info</th>
+                  <th>Course Track</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inquiries-tbody">
+                <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading student inquiries...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 5: CERTIFICATES MANAGEMENT
+             ========================================== -->
+        <section id="tab-certificates" class="tab-pane">
+          <div class="pane-header">
+            <div>
+              <h2>Digital Certificate Registry</h2>
+              <p>Issue authentic verifiable certificates with unique AR-2026-XXXX IDs</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openAddCertModal()" style="width: auto;">
+              <span>📜 Issue New Certificate</span>
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cert ID</th>
+                  <th>Scholar Name</th>
+                  <th>Course Title</th>
+                  <th>Mentor / Instructor</th>
+                  <th>Issue Date</th>
+                  <th>Grade</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="certificates-tbody">
+                <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading certificate database...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 6: SITE SETTINGS
+             ========================================== -->
+        <section id="tab-settings" class="tab-pane">
+          <div class="pane-header">
+            <div>
+              <h2>Platform &amp; Contact Settings</h2>
+              <p>Update top announcement badge, official contact phone, WhatsApp, email, and admin password</p>
+            </div>
+          </div>
+
+          <div class="mgmt-card" style="max-width: 700px;">
+            <form id="settings-form" onsubmit="saveSiteSettings(event)">
+              <div class="form-group">
+                <label class="form-label">Top Announcement Bar Text</label>
+                <input type="text" id="setting-announcement" class="form-control" required>
+              </div>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">Official Phone</label>
+                  <input type="text" id="setting-phone" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">WhatsApp Number (e.g. 919140410173)</label>
+                  <input type="text" id="setting-whatsapp" class="form-control" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Admissions Email Address</label>
+                <input type="email" id="setting-email" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Change Admin Password</label>
+                <input type="password" id="setting-password" class="form-control" placeholder="Leave empty to keep current password">
+              </div>
+              <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                <span>💾 Save Site Settings</span>
+              </button>
+            </form>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODALS
+       ========================================================================= -->
+  <!-- 1. Trainer Modal -->
+  <div class="modal-backdrop" id="trainer-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="trainer-modal-title">Edit Faculty Profile</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('trainer-modal')">✕</button>
+      </div>
+      <form id="trainer-form" onsubmit="saveTrainerData(event)">
+        <input type="hidden" id="tr-id">
+
+        <!-- Live Circle Preview -->
+        <div style="text-align: center;">
+          <div class="framing-preview-box">
+            <img src="" id="tr-preview-img" class="framing-preview-img" alt="Preview">
+          </div>
+          <div style="font-size: 0.78rem; color: var(--primary); font-weight: 800;">LIVE FRAMING PREVIEW</div>
+        </div>
+
+        <!-- Slider -->
+        <div class="slider-row">
+          <div class="slider-label">
+            <span>Vertical Framing Shift (Headroom Adjustment)</span>
+            <span id="tr-slider-val">15%</span>
+          </div>
+          <input type="range" id="tr-slider" class="slider-input" min="0" max="45" value="15" oninput="updateTrainerFramingPreview(this.value)">
+          <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">
+            <span>0% (Top / Low head)</span>
+            <span>20% (Balanced)</span>
+            <span>45% (High head)</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Full Name &amp; Title</label>
+          <input type="text" id="tr-name" class="form-control" placeholder="e.g. Er. Aman Sharma" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role / Official Designation</label>
+          <input type="text" id="tr-role" class="form-control" placeholder="e.g. Senior Full Stack Web Architect" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Course Pill</label>
+          <input type="text" id="tr-pill" class="form-control" placeholder="e.g. Mentor for: Web Development">
+        </div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label class="form-label">Experience</label>
+            <input type="text" id="tr-exp" class="form-control" placeholder="e.g. 8+">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Rating</label>
+            <input type="text" id="tr-rating" class="form-control" placeholder="e.g. 5.0★">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Batches</label>
+            <input type="text" id="tr-batches" class="form-control" placeholder="e.g. 55+">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Photo Image Path or Upload</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="tr-image" class="form-control" placeholder="./assets/images/..." onchange="onTrainerImageUrlChange(this.value)">
+            <label class="btn btn-outline btn-sm" style="white-space: nowrap; cursor: pointer;">
+              📁 Upload
+              <input type="file" accept="image/*" style="display: none;" onchange="handleImageUpload(event, 'tr-image', 'tr-preview-img')">
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">LinkedIn Profile URL</label>
+          <input type="url" id="tr-linkedin" class="form-control" placeholder="https://www.linkedin.com/in/...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bio (2-3 lines)</label>
+          <textarea id="tr-bio" class="form-control" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">
+          <span>💾 Save &amp; Sync to Frontend</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Project Modal -->
+  <div class="modal-backdrop" id="project-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="project-modal-title">Edit Project / App</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('project-modal')">✕</button>
+      </div>
+      <form id="project-form" onsubmit="saveProjectData(event)">
+        <input type="hidden" id="prj-id">
+        <div class="form-group">
+          <label class="form-label">Project Title</label>
+          <input type="text" id="prj-title" class="form-control" placeholder="e.g. Aakriti Ultrasound Portal" required>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Category Badge</label>
+            <input type="text" id="prj-badge" class="form-control" placeholder="e.g. Firebase Live • Web Portal">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <select id="prj-type" class="form-control">
+              <option value="web">Web Portal / SaaS</option>
+              <option value="mobile">Mobile App (Flutter)</option>
+              <option value="terminal">CLI / Terminal Tool</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lead Architect</label>
+          <input type="text" id="prj-author" class="form-control" placeholder="e.g. Er. Aman Sharma / Rohan Kumar">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Live App / Website URL</label>
+          <input type="url" id="prj-url" class="form-control" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Screenshot / Preview Image</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="prj-image" class="form-control" placeholder="./assets/images/...">
+            <label class="btn btn-outline btn-sm" style="white-space: nowrap; cursor: pointer;">
+              📁 Upload
+              <input type="file" accept="image/*" style="display: none;" onchange="handleImageUpload(event, 'prj-image')">
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tech Tags (comma separated)</label>
+          <input type="text" id="prj-tags" class="form-control" placeholder="Flutter Web, Dart, Firebase, Cloud Firestore">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="prj-desc" class="form-control" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">
+          <span>💾 Save &amp; Sync to Frontend</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Certificate Modal -->
+  <div class="modal-backdrop" id="cert-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Issue New Accredited Certificate</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('cert-modal')">✕</button>
+      </div>
+      <form id="cert-form" onsubmit="saveCertData(event)">
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Certificate ID</label>
+            <input type="text" id="crt-id" class="form-control" placeholder="AR-2026-XXXX" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Grade</label>
+            <input type="text" id="crt-grade" class="form-control" value="Grade A+ (Distinction)" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Student / Scholar Full Name</label>
+          <input type="text" id="crt-name" class="form-control" placeholder="e.g. RAHUL VERMA" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Course Title</label>
+          <input type="text" id="crt-course" class="form-control" placeholder="e.g. Full Stack Web Development Masterclass" required>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Instructor / Mentor</label>
+            <input type="text" id="crt-instructor" class="form-control" placeholder="e.g. Er. Aman Sharma" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duration</label>
+            <input type="text" id="crt-duration" class="form-control" value="3 Months" required>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Issue Date</label>
+            <input type="text" id="crt-issue" class="form-control" placeholder="e.g. 01 March 2026" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Placed Company (Optional)</label>
+            <input type="text" id="crt-placed" class="form-control" placeholder="e.g. TCS Digital">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">
+          <span>📜 Issue Official Certificate</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast">Changes saved successfully!</div>
+
+  <script>
+    // State
+    let authToken = localStorage.getItem('ar_admin_token') || '';
+    let currentTrainers = [];
+    let currentProjects = [];
+    let currentSettings = {};
+
+    // BroadcastChannel for instant cross-tab live updates
+    let syncChannel = null;
+    try {
+      syncChannel = new BroadcastChannel('ar_infotech_channel');
+    } catch(e) {}
+
+    function notifyFrontendSync() {
+      if (syncChannel) {
+        syncChannel.postMessage({ action: 'RELOAD_SITE_DATA' });
+      }
+    }
+
+    // Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      if (authToken) {
+        showAdminApp();
+      } else {
+        showLoginView();
+      }
+
+      // Check DB Status
+      fetch('/api/status')
+        .then(r => r.json())
+        .then(data => {
+          if (data.success && data.connected) {
+            document.getElementById('db-status-text').innerText = 'MongoDB Connected';
+            document.getElementById('db-health-dump').innerText = JSON.stringify(data, null, 2);
+          } else {
+            document.getElementById('db-status-text').innerText = 'DB Offline / Fallback';
+          }
+        }).catch(() => {
+          document.getElementById('db-status-text').innerText = 'Server Offline';
+        });
+    });
+
+    // Login Form
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const user = document.getElementById('login-user').value.trim();
+      const pass = document.getElementById('login-pass').value.trim();
+      const errBox = document.getElementById('login-error');
+
+      errBox.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pass })
+        });
+        const data = await res.json();
+        if (data.success && data.token) {
+          authToken = data.token;
+          localStorage.setItem('ar_admin_token', authToken);
+          showAdminApp();
+          showToast('Welcome back, Admin!');
+        } else {
+          errBox.innerText = data.error || 'Invalid credentials';
+          errBox.style.display = 'block';
+        }
+      } catch (err) {
+        errBox.innerText = 'Network error: ' + err.message;
+        errBox.style.display = 'block';
+      }
+    });
+
+    function showLoginView() {
+      document.getElementById('login-view').style.display = 'flex';
+      document.getElementById('admin-app').style.display = 'none';
+    }
+
+    function showAdminApp() {
+      document.getElementById('login-view').style.display = 'none';
+      document.getElementById('admin-app').style.display = 'flex';
+      loadAllAdminData();
+    }
+
+    function logoutAdmin() {
+      authToken = '';
+      localStorage.removeItem('ar_admin_token');
+      showLoginView();
+      showToast('Logged out successfully');
+    }
+
+    // Switch Sidebar Tab
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.sidebar-btn').forEach(el => el.classList.remove('active'));
+      
+      const targetPane = document.getElementById('tab-' + tabId);
+      if (targetPane) targetPane.classList.add('active');
+
+      const activeBtn = Array.from(document.querySelectorAll('.sidebar-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    // Load All Data
+    async function loadAllAdminData() {
+      await Promise.all([
+        loadSiteData(),
+        loadInquiries(),
+        loadCertificates(),
+        loadSettings()
+      ]);
+    }
+
+    // Load Site Data (Trainers & Projects)
+    async function loadSiteData() {
+      try {
+        const res = await fetch('/api/site-data?_t=' + Date.now());
+        const data = await res.json();
+        if (data.success) {
+          currentTrainers = data.trainers || [];
+          currentProjects = data.projects || [];
+          currentSettings = data.settings || {};
+
+          document.getElementById('stat-trainers-count').innerText = currentTrainers.length;
+          document.getElementById('stat-projects-count').innerText = currentProjects.length;
+
+          renderTrainersList(currentTrainers);
+          renderProjectsList(currentProjects);
+        }
+      } catch (e) {
+        console.error('Failed to load site data:', e);
+      }
+    }
+
+    // Render Trainers in Admin
+    function renderTrainersList(trainers) {
+      const container = document.getElementById('trainers-list-container');
+      container.innerHTML = trainers.map(t => {
+        const pos = t.objectPosition || '15%';
+        return `
+          <div class="mgmt-card">
+            <div style="display: flex; gap: 1.25rem; align-items: center;">
+              <div class="framing-preview-box" style="margin: 0; width: 104px; height: 104px;">
+                <img src="${t.image}" class="framing-preview-img" style="object-position: center ${pos};" alt="${t.name}">
+              </div>
+              <div style="flex: 1;">
+                <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main);">${t.name}</h3>
+                <p style="font-size: 0.82rem; color: var(--primary); font-weight: 600; margin-bottom: 0.35rem;">${t.role}</p>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">
+                  <span>⭐ ${t.rating || '4.9★'}</span> • <span>🎓 ${t.batches || '40+'} Batches</span> • <span>Framing: <strong>${pos}</strong></span>
+                </div>
+                ${t.linkedin ? `<a href="${t.linkedin}" target="_blank" style="font-size: 0.75rem; color: #0284c7; font-weight: 700; text-decoration: none; margin-top: 4px; display: inline-block;">🔗 LinkedIn Profile ↗</a>` : ''}
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+              <button class="btn btn-outline btn-sm" onclick="editTrainer('${t.trainerId}')">⚙️ Adjust Framing &amp; Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteTrainer('${t.trainerId}')">🗑️ Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Open Edit Trainer Modal
+    function editTrainer(id) {
+      const t = currentTrainers.find(x => x.trainerId === id);
+      if (!t) return;
+
+      document.getElementById('tr-id').value = t.trainerId;
+      document.getElementById('tr-name').value = t.name;
+      document.getElementById('tr-role').value = t.role;
+      document.getElementById('tr-pill').value = t.companyPill || '';
+      document.getElementById('tr-exp').value = t.yearsExp || '';
+      document.getElementById('tr-rating').value = t.rating || '';
+      document.getElementById('tr-batches').value = t.batches || '';
+      document.getElementById('tr-image').value = t.image || '';
+      document.getElementById('tr-linkedin').value = t.linkedin || '';
+      document.getElementById('tr-bio').value = t.bio || '';
+
+      const posNum = parseInt(t.objectPosition || '15', 10);
+      document.getElementById('tr-slider').value = posNum;
+      document.getElementById('tr-slider-val').innerText = posNum + '%';
+
+      const previewImg = document.getElementById('tr-preview-img');
+      previewImg.src = t.image;
+      previewImg.style.objectPosition = `center ${posNum}%`;
+
+      document.getElementById('trainer-modal-title').innerText = `Edit & Adjust: ${t.name}`;
+      openModal('trainer-modal');
+    }
+
+    function openAddTrainerModal() {
+      document.getElementById('tr-id').value = '';
+      document.getElementById('tr-name').value = '';
+      document.getElementById('tr-role').value = '';
+      document.getElementById('tr-pill').value = '';
+      document.getElementById('tr-exp').value = '5+';
+      document.getElementById('tr-rating').value = '4.9★';
+      document.getElementById('tr-batches').value = '30+';
+      document.getElementById('tr-image').value = './assets/images/logo.png';
+      document.getElementById('tr-linkedin').value = '';
+      document.getElementById('tr-bio').value = '';
+      document.getElementById('tr-slider').value = 15;
+      document.getElementById('tr-slider-val').innerText = '15%';
+
+      const previewImg = document.getElementById('tr-preview-img');
+      previewImg.src = './assets/images/logo.png';
+      previewImg.style.objectPosition = 'center 15%';
+
+      document.getElementById('trainer-modal-title').innerText = 'Add New Faculty Member';
+      openModal('trainer-modal');
+    }
+
+    function updateTrainerFramingPreview(val) {
+      document.getElementById('tr-slider-val').innerText = val + '%';
+      document.getElementById('tr-preview-img').style.objectPosition = `center ${val}%`;
+    }
+
+    function onTrainerImageUrlChange(url) {
+      document.getElementById('tr-preview-img').src = url;
+    }
+
+    async function saveTrainerData(e) {
+      e.preventDefault();
+      const payload = {
+        trainerId: document.getElementById('tr-id').value || ('trainer-' + Date.now()),
+        name: document.getElementById('tr-name').value.trim(),
+        role: document.getElementById('tr-role').value.trim(),
+        companyPill: document.getElementById('tr-pill').value.trim(),
+        yearsExp: document.getElementById('tr-exp').value.trim(),
+        rating: document.getElementById('tr-rating').value.trim(),
+        batches: document.getElementById('tr-batches').value.trim(),
+        image: document.getElementById('tr-image').value.trim(),
+        linkedin: document.getElementById('tr-linkedin').value.trim(),
+        bio: document.getElementById('tr-bio').value.trim(),
+        objectPosition: document.getElementById('tr-slider').value + '%'
+      };
+
+      try {
+        const res = await fetch('/api/admin/trainers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeModal('trainer-modal');
+          showToast(`Faculty "${payload.name}" saved! Synced to frontend.`);
+          loadSiteData();
+          notifyFrontendSync(); // Live sync trigger
+        }
+      } catch (err) {
+        alert('Failed to save trainer: ' + err.message);
+      }
+    }
+
+    async function deleteTrainer(id) {
+      if (!confirm('Are you sure you want to remove this faculty member?')) return;
+      try {
+        const res = await fetch(`/api/admin/trainers?id=${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          showToast('Faculty removed! Synced to frontend.');
+          loadSiteData();
+          notifyFrontendSync();
+        }
+      } catch (e) {
+        alert('Delete failed: ' + e.message);
+      }
+    }
+
+    // Render Projects
+    function renderProjectsList(projects) {
+      const container = document.getElementById('projects-list-container');
+      container.innerHTML = projects.map(p => `
+        <div class="mgmt-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+            <span class="badge-status badge-new">${p.categoryBadge || 'Production'}</span>
+            ${p.liveUrl ? `<a href="${p.liveUrl}" target="_blank" style="font-size: 0.78rem; font-weight: 700; color: var(--primary); text-decoration: none;">🚀 Open Live ↗</a>` : ''}
+          </div>
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.35rem;">${p.title}</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">${p.desc}</p>
+          <div style="font-size: 0.78rem; color: var(--text-sub); margin-top: auto;">
+            <span>Lead Architect: <strong>${p.author || 'AR Infotech'}</strong></span>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+            <button class="btn btn-outline btn-sm" onclick="editProject('${p.projectId}')">✏️ Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProject('${p.projectId}')">🗑️ Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function editProject(id) {
+      const p = currentProjects.find(x => x.projectId === id);
+      if (!p) return;
+      document.getElementById('prj-id').value = p.projectId;
+      document.getElementById('prj-title').value = p.title;
+      document.getElementById('prj-badge').value = p.categoryBadge || '';
+      document.getElementById('prj-type').value = p.type || 'web';
+      document.getElementById('prj-author').value = p.author || '';
+      document.getElementById('prj-url').value = p.liveUrl || '';
+      document.getElementById('prj-image').value = p.previewImage || '';
+      document.getElementById('prj-tags').value = (p.techTags || []).join(', ');
+      document.getElementById('prj-desc').value = p.desc || '';
+
+      document.getElementById('project-modal-title').innerText = `Edit Project: ${p.title}`;
+      openModal('project-modal');
+    }
+
+    function openAddProjectModal() {
+      document.getElementById('prj-id').value = '';
+      document.getElementById('prj-title').value = '';
+      document.getElementById('prj-badge').value = 'Production Live';
+      document.getElementById('prj-type').value = 'web';
+      document.getElementById('prj-author').value = 'AR Infotech';
+      document.getElementById('prj-url').value = '';
+      document.getElementById('prj-image').value = './assets/images/logo.png';
+      document.getElementById('prj-tags').value = 'Flutter, Web, Firebase';
+      document.getElementById('prj-desc').value = '';
+
+      document.getElementById('project-modal-title').innerText = 'Add New Software Project';
+      openModal('project-modal');
+    }
+
+    async function saveProjectData(e) {
+      e.preventDefault();
+      const tags = document.getElementById('prj-tags').value.split(',').map(s => s.trim()).filter(Boolean);
+      const payload = {
+        projectId: document.getElementById('prj-id').value || ('project-' + Date.now()),
+        title: document.getElementById('prj-title').value.trim(),
+        categoryBadge: document.getElementById('prj-badge').value.trim(),
+        type: document.getElementById('prj-type').value,
+        author: document.getElementById('prj-author').value.trim(),
+        liveUrl: document.getElementById('prj-url').value.trim(),
+        previewImage: document.getElementById('prj-image').value.trim(),
+        techTags: tags,
+        desc: document.getElementById('prj-desc').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/admin/projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeModal('project-modal');
+          showToast(`Project "${payload.title}" saved! Synced to frontend.`);
+          loadSiteData();
+          notifyFrontendSync();
+        }
+      } catch (err) {
+        alert('Failed to save project: ' + err.message);
+      }
+    }
+
+    async function deleteProject(id) {
+      if (!confirm('Are you sure you want to delete this project?')) return;
+      try {
+        const res = await fetch(`/api/admin/projects?id=${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          showToast('Project deleted! Synced to frontend.');
+          loadSiteData();
+          notifyFrontendSync();
+        }
+      } catch (e) {
+        alert('Delete failed: ' + e.message);
+      }
+    }
+
+    // Inquiries / Leads CRM
+    async function loadInquiries() {
+      try {
+        const res = await fetch('/api/inquiries?limit=100');
+        const data = await res.json();
+        if (data.success) {
+          const leads = data.data || [];
+          document.getElementById('stat-leads-count').innerText = leads.length;
+          const tbody = document.getElementById('inquiries-tbody');
+          if (leads.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No student inquiries received yet.</td></tr>`;
+            return;
+          }
+          tbody.innerHTML = leads.map(l => {
+            const statusClass = l.status === 'Enrolled' ? 'badge-enrolled' : (l.status === 'Contacted' ? 'badge-contacted' : 'badge-new');
+            const dateStr = l.createdAt ? new Date(l.createdAt).toLocaleDateString() : 'Recent';
+            return `
+              <tr>
+                <td><strong style="color: var(--primary); font-family: 'JetBrains Mono';">${l.refId}</strong></td>
+                <td><strong>${l.name}</strong></td>
+                <td>
+                  <div>📞 <a href="tel:${l.phone}" style="color: var(--primary); font-weight: 600; text-decoration: none;">${l.phone}</a></div>
+                  ${l.email ? `<div style="font-size: 0.75rem; color: var(--text-muted);">${l.email}</div>` : ''}
+                </td>
+                <td><span style="font-weight: 600;">${l.course || 'General'}</span></td>
+                <td><span style="color: var(--text-muted); font-size: 0.8rem;">${dateStr}</span></td>
+                <td>
+                  <select onchange="updateLeadStatus('${l.refId}', this.value)" style="background: #ffffff; color: var(--text-main); border: 1px solid var(--border-darker); border-radius: 4px; padding: 3px 6px; font-size: 0.78rem;">
+                    <option value="New" ${l.status === 'New' || !l.status ? 'selected' : ''}>New</option>
+                    <option value="Contacted" ${l.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
+                    <option value="Enrolled" ${l.status === 'Enrolled' ? 'selected' : ''}>Enrolled</option>
+                  </select>
+                </td>
+                <td>
+                  <a href="https://wa.me/${(l.phone || '').replace(/[^0-9]/g, '')}" target="_blank" class="btn btn-success btn-sm" style="padding: 3px 8px; font-size: 0.75rem;">💬 Chat</a>
+                  <button onclick="deleteLead('${l.refId}')" class="btn btn-danger btn-sm" style="padding: 3px 8px; font-size: 0.75rem;">✕</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+      } catch (e) {
+        console.error('Failed to load inquiries:', e);
+      }
+    }
+
+    async function updateLeadStatus(refId, status) {
+      await fetch('/api/admin/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refId, status })
+      });
+      showToast(`Status updated to ${status}`);
+    }
+
+    async function deleteLead(refId) {
+      if (!confirm('Delete this inquiry record?')) return;
+      await fetch(`/api/admin/inquiries?refId=${refId}`, { method: 'DELETE' });
+      showToast('Lead record removed');
+      loadInquiries();
+    }
+
+    // Certificates
+    async function loadCertificates() {
+      try {
+        const res = await fetch('/api/admin/certificates');
+        const data = await res.json();
+        if (data.success) {
+          const certs = data.certificates || [];
+          document.getElementById('stat-certs-count').innerText = certs.length;
+          const tbody = document.getElementById('certificates-tbody');
+          tbody.innerHTML = certs.map(c => `
+            <tr>
+              <td><strong style="color: var(--primary); font-family: 'JetBrains Mono';">${c.certId}</strong></td>
+              <td><strong>${c.studentName}</strong></td>
+              <td>${c.courseName}</td>
+              <td><span style="font-size: 0.8rem; color: var(--text-muted);">${c.instructor || 'AR Faculty'}</span></td>
+              <td>${c.issueDate}</td>
+              <td><span class="badge-status badge-enrolled">${c.grade || 'Grade A+'}</span></td>
+              <td>
+                <button onclick="deleteCert('${c.certId}')" class="btn btn-danger btn-sm" style="padding: 3px 8px; font-size: 0.75rem;">✕ Remove</button>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (e) {
+        console.error('Failed to load certs:', e);
+      }
+    }
+
+    function openAddCertModal() {
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('crt-id').value = `AR-2026-${randomNum}`;
+      document.getElementById('crt-name').value = '';
+      document.getElementById('crt-course').value = '';
+      document.getElementById('crt-instructor').value = 'Er. Aman Sharma (Lead Architect)';
+      document.getElementById('crt-issue').value = '01 March 2026';
+      document.getElementById('crt-placed').value = '';
+      openModal('cert-modal');
+    }
+
+    async function saveCertData(e) {
+      e.preventDefault();
+      const payload = {
+        certId: document.getElementById('crt-id').value.trim(),
+        studentName: document.getElementById('crt-name').value.trim().toUpperCase(),
+        courseName: document.getElementById('crt-course').value.trim(),
+        instructor: document.getElementById('crt-instructor').value.trim(),
+        duration: document.getElementById('crt-duration').value.trim(),
+        issueDate: document.getElementById('crt-issue').value.trim(),
+        grade: document.getElementById('crt-grade').value.trim(),
+        placedCompany: document.getElementById('crt-placed').value.trim() || 'Industry Partner',
+        status: 'Verified & Active'
+      };
+
+      try {
+        const res = await fetch('/api/certificates', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeModal('cert-modal');
+          showToast(`Certificate ${payload.certId} issued!`);
+          loadCertificates();
+        }
+      } catch (err) {
+        alert('Failed to issue certificate: ' + err.message);
+      }
+    }
+
+    async function deleteCert(certId) {
+      if (!confirm(`Delete certificate ${certId}?`)) return;
+      await fetch(`/api/admin/certificates?id=${certId}`, { method: 'DELETE' });
+      showToast('Certificate removed');
+      loadCertificates();
+    }
+
+    // Site Settings
+    async function loadSettings() {
+      try {
+        const res = await fetch('/api/admin/settings');
+        const data = await res.json();
+        if (data.success && data.settings) {
+          const s = data.settings;
+          document.getElementById('setting-announcement').value = s.announcementText || '';
+          document.getElementById('setting-phone').value = s.phone || '';
+          document.getElementById('setting-whatsapp').value = s.whatsapp || '';
+          document.getElementById('setting-email').value = s.email || '';
+        }
+      } catch (e) {
+        console.error('Failed to load settings:', e);
+      }
+    }
+
+    async function saveSiteSettings(e) {
+      e.preventDefault();
+      const payload = {
+        announcementText: document.getElementById('setting-announcement').value.trim(),
+        phone: document.getElementById('setting-phone').value.trim(),
+        whatsapp: document.getElementById('setting-whatsapp').value.trim(),
+        email: document.getElementById('setting-email').value.trim()
+      };
+      const newPass = document.getElementById('setting-password').value.trim();
+      if (newPass) payload.adminPassword = newPass;
+
+      try {
+        const res = await fetch('/api/admin/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('Settings saved! Synced to frontend.');
+          notifyFrontendSync();
+        }
+      } catch (err) {
+        alert('Failed to save settings: ' + err.message);
+      }
+    }
+
+    // Direct Image Upload
+    async function handleImageUpload(e, inputId, previewImgId) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = reader.result;
+        try {
+          const res = await fetch('/api/admin/upload-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: file.name, base64 })
+          });
+          const data = await res.json();
+          if (data.success) {
+            document.getElementById(inputId).value = data.url;
+            if (previewImgId) {
+              document.getElementById(previewImgId).src = data.url;
+            }
+            showToast(`Image "${data.filename}" uploaded!`);
+          } else {
+            alert('Upload failed: ' + data.error);
+          }
+        } catch (err) {
+          alert('Upload failed: ' + err.message);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Modal Helpers
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // Toast Helper
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3200);
+    }
+  </script>
+</body>
+</html>
