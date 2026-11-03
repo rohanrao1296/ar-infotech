@@ -97,7 +97,7 @@ const server = http.createServer(async (req, res) => {
       console.log(`[Lead Saved] ${saved.name} (${saved.phone}) - Course: ${saved.course} - Ref: ${saved.refId}`);
       return sendJson(res, 201, {
         success: true,
-        message: 'Registration saved successfully to AR Infotech database.',
+        message: 'Registration submitted successfully.',
         refId: saved.refId,
         data: saved
       });
@@ -130,13 +130,13 @@ const server = http.createServer(async (req, res) => {
       if (!cert) {
         return sendJson(res, 404, {
           success: false,
-          error: 'Certificate record not found in AR Infotech database.'
+          error: 'Certificate record not found in official records.'
         });
       }
 
       return sendJson(res, 200, {
         success: true,
-        source: 'MongoDB',
+        source: 'Official Records',
         certificate: cert
       });
     } catch (err) {

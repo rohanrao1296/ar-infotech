@@ -756,7 +756,7 @@ function initCertificateVerification() {
         }
       }
     } catch (err) {
-      console.warn('MongoDB verification offline notice:', err);
+      console.warn('Verification service notice:', err);
     }
 
     // Client-side fallback if server offline
@@ -786,7 +786,7 @@ function initCertificateVerification() {
       updateCertificateDisplay(cert);
 
       const dbBadge = fromDb 
-        ? `<span class="badge badge-green" style="font-size: 0.72rem; display: inline-flex; align-items: center; gap: 0.25rem;">🗄️ Verified via MongoDB</span>` 
+        ? `<span class="badge badge-green" style="font-size: 0.72rem; display: inline-flex; align-items: center; gap: 0.25rem;">🛡️ Official Verified Credential</span>` 
         : '';
       const verifiedCounter = cert.verifiedCount 
         ? ` • Verified ${cert.verifiedCount} times` 
@@ -1040,7 +1040,7 @@ function initEnquiryForm() {
     const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Submit Registration';
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span>⏳ Saving to MongoDB...</span>';
+      submitBtn.innerHTML = '<span>⏳ Submitting Application...</span>';
     }
 
     const clientRefId = 'AR-' + Math.floor(100000 + Math.random() * 900000);
@@ -1057,7 +1057,7 @@ function initEnquiryForm() {
 
     let confirmedRefId = clientRefId;
 
-    // Send to MongoDB backend API
+    // Send to backend API
     try {
       const response = await fetch('/api/inquiries', {
         method: 'POST',
@@ -1083,7 +1083,7 @@ function initEnquiryForm() {
     existing.push(enquiryData);
     localStorage.setItem('ar_enquiries', JSON.stringify(existing));
 
-    showToast(`🎉 Registration Saved to MongoDB! Ref ID: ${confirmedRefId}`);
+    showToast(`🎉 Registration submitted successfully! Ref ID: ${confirmedRefId}`);
     form.reset();
 
     // If WhatsApp requested, redirect
@@ -1103,7 +1103,7 @@ function initEnquiryForm() {
     }
   });
 
-  // Footer newsletter subscription to MongoDB
+  // Footer newsletter subscription
   const newsletterForm = document.querySelector('.footer-newsletter-box');
   newsletterForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -1117,7 +1117,7 @@ function initEnquiryForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
-      showToast('📬 Subscribed & saved to MongoDB!');
+      showToast('📬 Subscribed successfully!');
     } catch (err) {
       showToast('📬 Subscribed successfully!');
     }
@@ -1361,7 +1361,7 @@ try {
   const syncChannel = new BroadcastChannel('ar_infotech_channel');
   syncChannel.onmessage = (event) => {
     if (event.data && event.data.action === 'RELOAD_SITE_DATA') {
-      console.log('[Realtime Sync] Admin updated database, refreshing frontend...');
+      console.log('[Realtime Sync] Content updated, refreshing view...');
       syncDynamicSiteData();
     }
   };
