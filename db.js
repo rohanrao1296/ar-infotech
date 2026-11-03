@@ -2,6 +2,12 @@ require('dotenv').config();
 const { MongoClient } = require('mongodb');
 const fs = require('fs');
 const path = require('path');
+const dns = require('dns');
+
+// Ensure reliable DNS resolution for MongoDB Atlas SRV connection strings
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch (e) {}
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
 const DB_NAME = process.env.DB_NAME || 'arinfotech';
@@ -327,9 +333,10 @@ async function connectDB() {
   try {
     const maskedUri = MONGODB_URI.replace(/\/\/.*@/, '//***@');
     console.log(`[MongoDB] Attempting connection to ${maskedUri} ...`);
+    const isCloud = MONGODB_URI.includes('mongodb+srv://') || MONGODB_URI.includes('@');
     client = new MongoClient(MONGODB_URI, {
-      serverSelectionTimeoutMS: 2500,
-      connectTimeoutMS: 2500
+      serverSelectionTimeoutMS: isCloud ? 10000 : 2500,
+      connectTimeoutMS: isCloud ? 10000 : 2500
     });
     await client.connect();
     db = client.db(DB_NAME);
