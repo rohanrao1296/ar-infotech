@@ -273,6 +273,27 @@
       box-shadow: 0 0 6px var(--success);
     }
 
+    .user-role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .badge-superadmin {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      color: #92400e;
+      border: 1px solid #f59e0b;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+    }
+    .badge-admin-role {
+      background: rgba(0, 82, 204, 0.08);
+      color: var(--primary);
+      border: 1px solid rgba(0, 82, 204, 0.25);
+    }
+
     /* Main Layout */
     
     .user-role-badge {
@@ -763,6 +784,52 @@
         </section>
 
         <!-- ==========================================
+             TAB 7: MANAGE ADMIN ACCOUNTS (SUPER ADMIN ONLY)
+             ========================================== -->
+        <section id="tab-admins" class="tab-pane">
+          <div class="pane-header">
+            <div>
+              <h2>👥 Manage Admin Accounts &amp; Staff Roles</h2>
+              <p>Create and control admin accounts with operational access restricted strictly to Admissions CRM and Certificates.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openAdminUserModal()">
+              <span>➕ Create New Admin Account</span>
+            </button>
+          </div>
+
+          <div class="pane-card" style="margin-bottom: 2rem;">
+            <div style="background: rgba(0, 82, 204, 0.05); border: 1.5px dashed var(--primary); padding: 1.25rem 1.5rem; border-radius: var(--radius-lg); margin-bottom: 1.5rem;">
+              <h4 style="color: var(--primary); font-size: 1.05rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🛡️ Role-Based Access Control (RBAC) System</span>
+              </h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.55;">
+                • <strong>Super Admin (You):</strong> Unrestricted master access. Full control over Faculty order/stats, Software projects, Sub-Admin staff accounts, and Global site settings.<br>
+                • <strong>Admin (Created below):</strong> Operational access limited strictly to <strong>📋 Admissions CRM</strong> and <strong>📜 Certificates Registry</strong>. All other tabs, settings, and faculty management are completely hidden from their login.
+              </p>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                    <th>Permissions</th>
+                    <th>Created Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading admin accounts...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
              TAB 2: FACULTY & FRAMING ADJUSTER
              ========================================== -->
         <section id="tab-trainers" class="tab-pane">
@@ -782,6 +849,52 @@
         </section>
 
         <!-- ==========================================
+             TAB 7: MANAGE ADMIN ACCOUNTS (SUPER ADMIN ONLY)
+             ========================================== -->
+        <section id="tab-admins" class="tab-pane">
+          <div class="pane-header">
+            <div>
+              <h2>👥 Manage Admin Accounts &amp; Staff Roles</h2>
+              <p>Create and control admin accounts with operational access restricted strictly to Admissions CRM and Certificates.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openAdminUserModal()">
+              <span>➕ Create New Admin Account</span>
+            </button>
+          </div>
+
+          <div class="pane-card" style="margin-bottom: 2rem;">
+            <div style="background: rgba(0, 82, 204, 0.05); border: 1.5px dashed var(--primary); padding: 1.25rem 1.5rem; border-radius: var(--radius-lg); margin-bottom: 1.5rem;">
+              <h4 style="color: var(--primary); font-size: 1.05rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🛡️ Role-Based Access Control (RBAC) System</span>
+              </h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.55;">
+                • <strong>Super Admin (You):</strong> Unrestricted master access. Full control over Faculty order/stats, Software projects, Sub-Admin staff accounts, and Global site settings.<br>
+                • <strong>Admin (Created below):</strong> Operational access limited strictly to <strong>📋 Admissions CRM</strong> and <strong>📜 Certificates Registry</strong>. All other tabs, settings, and faculty management are completely hidden from their login.
+              </p>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                    <th>Permissions</th>
+                    <th>Created Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading admin accounts...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
              TAB 3: SOFTWARE LAB & PROJECTS
              ========================================== -->
         <section id="tab-projects" class="tab-pane">
@@ -797,6 +910,52 @@
 
           <div class="grid-2" id="projects-list-container">
             <!-- Injected dynamically -->
+          </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 7: MANAGE ADMIN ACCOUNTS (SUPER ADMIN ONLY)
+             ========================================== -->
+        <section id="tab-admins" class="tab-pane">
+          <div class="pane-header">
+            <div>
+              <h2>👥 Manage Admin Accounts &amp; Staff Roles</h2>
+              <p>Create and control admin accounts with operational access restricted strictly to Admissions CRM and Certificates.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openAdminUserModal()">
+              <span>➕ Create New Admin Account</span>
+            </button>
+          </div>
+
+          <div class="pane-card" style="margin-bottom: 2rem;">
+            <div style="background: rgba(0, 82, 204, 0.05); border: 1.5px dashed var(--primary); padding: 1.25rem 1.5rem; border-radius: var(--radius-lg); margin-bottom: 1.5rem;">
+              <h4 style="color: var(--primary); font-size: 1.05rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🛡️ Role-Based Access Control (RBAC) System</span>
+              </h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.55;">
+                • <strong>Super Admin (You):</strong> Unrestricted master access. Full control over Faculty order/stats, Software projects, Sub-Admin staff accounts, and Global site settings.<br>
+                • <strong>Admin (Created below):</strong> Operational access limited strictly to <strong>📋 Admissions CRM</strong> and <strong>📜 Certificates Registry</strong>. All other tabs, settings, and faculty management are completely hidden from their login.
+              </p>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                    <th>Permissions</th>
+                    <th>Created Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading admin accounts...</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 
@@ -835,6 +994,52 @@
         </section>
 
         <!-- ==========================================
+             TAB 7: MANAGE ADMIN ACCOUNTS (SUPER ADMIN ONLY)
+             ========================================== -->
+        <section id="tab-admins" class="tab-pane">
+          <div class="pane-header">
+            <div>
+              <h2>👥 Manage Admin Accounts &amp; Staff Roles</h2>
+              <p>Create and control admin accounts with operational access restricted strictly to Admissions CRM and Certificates.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openAdminUserModal()">
+              <span>➕ Create New Admin Account</span>
+            </button>
+          </div>
+
+          <div class="pane-card" style="margin-bottom: 2rem;">
+            <div style="background: rgba(0, 82, 204, 0.05); border: 1.5px dashed var(--primary); padding: 1.25rem 1.5rem; border-radius: var(--radius-lg); margin-bottom: 1.5rem;">
+              <h4 style="color: var(--primary); font-size: 1.05rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🛡️ Role-Based Access Control (RBAC) System</span>
+              </h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.55;">
+                • <strong>Super Admin (You):</strong> Unrestricted master access. Full control over Faculty order/stats, Software projects, Sub-Admin staff accounts, and Global site settings.<br>
+                • <strong>Admin (Created below):</strong> Operational access limited strictly to <strong>📋 Admissions CRM</strong> and <strong>📜 Certificates Registry</strong>. All other tabs, settings, and faculty management are completely hidden from their login.
+              </p>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                    <th>Permissions</th>
+                    <th>Created Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading admin accounts...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
              TAB 5: CERTIFICATES MANAGEMENT
              ========================================== -->
         <section id="tab-certificates" class="tab-pane">
@@ -865,6 +1070,52 @@
                 <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading certificate database...</td></tr>
               </tbody>
             </table>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             TAB 7: MANAGE ADMIN ACCOUNTS (SUPER ADMIN ONLY)
+             ========================================== -->
+        <section id="tab-admins" class="tab-pane">
+          <div class="pane-header">
+            <div>
+              <h2>👥 Manage Admin Accounts &amp; Staff Roles</h2>
+              <p>Create and control admin accounts with operational access restricted strictly to Admissions CRM and Certificates.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openAdminUserModal()">
+              <span>➕ Create New Admin Account</span>
+            </button>
+          </div>
+
+          <div class="pane-card" style="margin-bottom: 2rem;">
+            <div style="background: rgba(0, 82, 204, 0.05); border: 1.5px dashed var(--primary); padding: 1.25rem 1.5rem; border-radius: var(--radius-lg); margin-bottom: 1.5rem;">
+              <h4 style="color: var(--primary); font-size: 1.05rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🛡️ Role-Based Access Control (RBAC) System</span>
+              </h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.55;">
+                • <strong>Super Admin (You):</strong> Unrestricted master access. Full control over Faculty order/stats, Software projects, Sub-Admin staff accounts, and Global site settings.<br>
+                • <strong>Admin (Created below):</strong> Operational access limited strictly to <strong>📋 Admissions CRM</strong> and <strong>📜 Certificates Registry</strong>. All other tabs, settings, and faculty management are completely hidden from their login.
+              </p>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                    <th>Permissions</th>
+                    <th>Created Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading admin accounts...</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 
@@ -956,6 +1207,52 @@
             </div>
           </div>
         </section>
+        <!-- ==========================================
+             TAB 7: MANAGE ADMIN ACCOUNTS (SUPER ADMIN ONLY)
+             ========================================== -->
+        <section id="tab-admins" class="tab-pane">
+          <div class="pane-header">
+            <div>
+              <h2>👥 Manage Admin Accounts &amp; Staff Roles</h2>
+              <p>Create and control admin accounts with operational access restricted strictly to Admissions CRM and Certificates.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openAdminUserModal()">
+              <span>➕ Create New Admin Account</span>
+            </button>
+          </div>
+
+          <div class="pane-card" style="margin-bottom: 2rem;">
+            <div style="background: rgba(0, 82, 204, 0.05); border: 1.5px dashed var(--primary); padding: 1.25rem 1.5rem; border-radius: var(--radius-lg); margin-bottom: 1.5rem;">
+              <h4 style="color: var(--primary); font-size: 1.05rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🛡️ Role-Based Access Control (RBAC) System</span>
+              </h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.55;">
+                • <strong>Super Admin (You):</strong> Unrestricted master access. Full control over Faculty order/stats, Software projects, Sub-Admin staff accounts, and Global site settings.<br>
+                • <strong>Admin (Created below):</strong> Operational access limited strictly to <strong>📋 Admissions CRM</strong> and <strong>📜 Certificates Registry</strong>. All other tabs, settings, and faculty management are completely hidden from their login.
+              </p>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                    <th>Permissions</th>
+                    <th>Created Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading admin accounts...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
       </main>
     </div>
   </div>
@@ -1163,6 +1460,16 @@
   <div id="toast">Changes saved successfully!</div>
 
   <script>
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     // State
     let authToken = localStorage.getItem('ar_admin_token') || '';
     let currentTrainers = [];
@@ -1243,36 +1550,91 @@
     function showAdminApp() {
       document.getElementById('login-view').style.display = 'none';
       document.getElementById('admin-app').style.display = 'flex';
+
+      const currentUser = JSON.parse(localStorage.getItem('ar_admin_user') || '{"role":"superadmin","username":"admin"}');
+      const isSuperAdmin = (currentUser.role === 'superadmin');
+
+      // Update Header Badge
+      const badge = document.getElementById('admin-user-badge');
+      if (badge) {
+        badge.innerHTML = isSuperAdmin 
+          ? `⭐ <strong>Super Admin</strong> (${escapeHtml(currentUser.username)})` 
+          : `👤 <strong>Admin</strong> (${escapeHtml(currentUser.username)})`;
+        badge.className = isSuperAdmin ? 'user-role-badge badge-superadmin' : 'user-role-badge badge-admin-role';
+      }
+
+      // Filter sidebar buttons based on role
+      document.querySelectorAll('.sidebar-btn').forEach(btn => {
+        const roles = btn.getAttribute('data-roles') || 'superadmin,admin';
+        if (!roles.includes(currentUser.role)) {
+          btn.style.display = 'none';
+        } else {
+          btn.style.display = 'flex';
+        }
+      });
+
+      // Default landing tab based on role
+      if (!isSuperAdmin) {
+        switchTab('inquiries');
+      } else {
+        switchTab('overview');
+      }
+
       loadAllAdminData();
     }
 
     function logoutAdmin() {
       authToken = '';
       localStorage.removeItem('ar_admin_token');
+      localStorage.removeItem('ar_admin_user');
       showLoginView();
       showToast('Logged out successfully');
     }
 
     // Switch Sidebar Tab
     function switchTab(tabId) {
+      const currentUser = JSON.parse(localStorage.getItem('ar_admin_user') || '{"role":"superadmin","username":"admin"}');
+      const isSuperAdmin = (currentUser.role === 'superadmin');
+
+      // Security check: restrict regular admins to CRM and Certificates
+      if (!isSuperAdmin && tabId !== 'inquiries' && tabId !== 'certificates') {
+        showToast('⚠️ Access restricted to Super Admin');
+        tabId = 'inquiries';
+      }
+
       document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.sidebar-btn').forEach(el => el.classList.remove('active'));
       
       const targetPane = document.getElementById('tab-' + tabId);
       if (targetPane) targetPane.classList.add('active');
 
-      const activeBtn = Array.from(document.querySelectorAll('.sidebar-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+      const activeBtn = Array.from(document.querySelectorAll('.sidebar-btn')).find(b => {
+        const oc = b.getAttribute('onclick') || '';
+        return oc.includes(`'${tabId}'`);
+      });
       if (activeBtn) activeBtn.classList.add('active');
+
+      // If switching to Manage Admins, load users immediately!
+      if (tabId === 'admins') {
+        loadAdminUsers();
+      }
     }
 
     // Load All Data
     async function loadAllAdminData() {
-      await Promise.all([
-        loadSiteData(),
+      const currentUser = JSON.parse(localStorage.getItem('ar_admin_user') || '{"role":"superadmin","username":"admin"}');
+      const isSuperAdmin = (currentUser.role === 'superadmin');
+
+      const tasks = [
         loadInquiries(),
-        loadCertificates(),
-        loadSettings()
-      ]);
+        loadCertificates()
+      ];
+
+      if (isSuperAdmin) {
+        tasks.push(loadSiteData(), loadSettings(), loadAdminUsers());
+      }
+
+      await Promise.all(tasks);
     }
 
     // Load Site Data (Trainers & Projects)
