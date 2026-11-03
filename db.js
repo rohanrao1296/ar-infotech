@@ -17,6 +17,7 @@ let client = null;
 let db = null;
 let isConnecting = false;
 let mongoAttempted = false;
+let lastMongoAttempt = 0;
 
 // Local Persistent File Database Configuration (Guarantees 100% uptime on Render/Cloud even without MongoDB Atlas)
 const DATA_DIR = path.join(__dirname, 'data');
@@ -322,7 +323,10 @@ ensureJsonDb();
 // =========================================================================
 async function connectDB() {
   if (db) return db;
-  if (mongoAttempted && !db) return null; // Don't block requests if MongoDB is offline
+  // If connection failed recently, wait 30 seconds before retrying so we don't block requests
+  if (mongoAttempted && !db && (Date.now() - lastMongoAttempt < 30000)) {
+    return null;
+  }
   if (isConnecting) {
     while (isConnecting) {
       await new Promise(r => setTimeout(r, 100));
@@ -331,13 +335,14 @@ async function connectDB() {
   }
 
   isConnecting = true;
+  lastMongoAttempt = Date.now();
   try {
     const maskedUri = MONGODB_URI.replace(/\/\/.*@/, '//***@');
     console.log(`[MongoDB] Attempting connection to ${maskedUri} ...`);
     const isCloud = MONGODB_URI.includes('mongodb+srv://') || MONGODB_URI.includes('@');
     client = new MongoClient(MONGODB_URI, {
-      serverSelectionTimeoutMS: isCloud ? 10000 : 2500,
-      connectTimeoutMS: isCloud ? 10000 : 2500
+      serverSelectionTimeoutMS: isCloud ? 6000 : 2500,
+      connectTimeoutMS: isCloud ? 6000 : 2500
     });
     await client.connect();
     db = client.db(DB_NAME);
@@ -352,6 +357,7 @@ async function connectDB() {
   } catch (error) {
     isConnecting = false;
     mongoAttempted = true;
+    lastMongoAttempt = Date.now();
     console.log(`[MongoDB] Notice: Running on local persistent file engine (${error.message})`);
     db = null;
     return null;
