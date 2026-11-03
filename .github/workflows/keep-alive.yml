@@ -22,3 +22,4 @@ jobs:
             sleep 5
             curl -s https://arinfo-tech.onrender.com/api/status
           fi
+
