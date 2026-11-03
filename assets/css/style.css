@@ -90,9 +90,9 @@ html {
   scroll-behavior: smooth;
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
-  overflow-x: hidden;
-  max-width: 100%;
-  width: 100%;
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  width: 100% !important;
 }
 
 body {
@@ -100,9 +100,9 @@ body {
   background-color: var(--bg-body);
   color: var(--text-body);
   line-height: 1.6;
-  overflow-x: hidden;
-  max-width: 100%;
-  width: 100%;
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  width: 100% !important;
   position: relative;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -219,7 +219,9 @@ ul, ol {
   padding: 0.8rem 1.6rem;
   border-radius: var(--radius-md);
   transition: all var(--transition-normal);
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  max-width: 100%;
 }
 
 .btn-primary {
@@ -761,6 +763,9 @@ ul, ol {
   color: var(--primary);
   margin-bottom: 1.5rem;
   animation: floatSubtle 4s ease-in-out infinite;
+  max-width: 100%;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .hero-badge-pill .pulse-dot {
@@ -1432,7 +1437,7 @@ ul, ol {
 
 .method-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: 2rem;
   position: relative;
 }
@@ -2405,7 +2410,7 @@ ul, ol {
 
 .career-pillars-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: 1.75rem;
   margin-bottom: 3.5rem;
 }
@@ -3388,6 +3393,9 @@ textarea.form-control {
 
   .hero-content {
     text-align: left;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   .hero-badge-pill {
@@ -3398,8 +3406,10 @@ textarea.form-control {
   }
 
   .hero-title {
-    font-size: 1.95rem;
+    font-size: 1.85rem;
     line-height: 1.22;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   .hero-desc {
@@ -3503,26 +3513,36 @@ textarea.form-control {
 /* 5. Ultra-Compact Mobile Phones (<= 380px) */
 @media (max-width: 380px) {
   .container {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+    padding-left: 0.65rem;
+    padding-right: 0.65rem;
   }
 
   .brand-logo-img {
-    height: 40px;
-    max-width: 150px;
+    height: 38px;
+    max-width: 140px;
   }
 
   .hero-title {
-    font-size: 1.7rem;
+    font-size: 1.55rem;
+    line-height: 1.2;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   .hero-badge-pill {
-    font-size: 0.72rem;
-    padding: 0.3rem 0.65rem;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-md);
+    line-height: 1.3;
+  }
+
+  .hero-discount-banner {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
   }
 
   .course-card-body,
   .project-card-body {
-    padding: 1.25rem 1rem;
+    padding: 1.15rem 0.75rem;
   }
 }
