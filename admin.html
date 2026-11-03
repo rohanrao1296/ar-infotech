@@ -684,27 +684,31 @@
     <div class="admin-body">
       <!-- Sidebar -->
       <aside class="admin-sidebar">
-        <button class="sidebar-btn active" onclick="switchTab('overview')">
+        <button class="sidebar-btn active" data-roles="superadmin" onclick="switchTab('overview')">
           <span class="sidebar-icon">📊</span>
           <span>Overview</span>
         </button>
-        <button class="sidebar-btn" onclick="switchTab('trainers')">
+        <button class="sidebar-btn" data-roles="superadmin" onclick="switchTab('trainers')">
           <span class="sidebar-icon">👨‍🏫</span>
           <span>Faculty &amp; Framing</span>
         </button>
-        <button class="sidebar-btn" onclick="switchTab('projects')">
+        <button class="sidebar-btn" data-roles="superadmin" onclick="switchTab('projects')">
           <span class="sidebar-icon">🚀</span>
           <span>Software &amp; Apps</span>
         </button>
-        <button class="sidebar-btn" onclick="switchTab('inquiries')">
+        <button class="sidebar-btn" data-roles="superadmin,admin" onclick="switchTab('inquiries')">
           <span class="sidebar-icon">📋</span>
           <span>Admissions CRM</span>
         </button>
-        <button class="sidebar-btn" onclick="switchTab('certificates')">
+        <button class="sidebar-btn" data-roles="superadmin,admin" onclick="switchTab('certificates')">
           <span class="sidebar-icon">📜</span>
           <span>Certificates</span>
         </button>
-        <button class="sidebar-btn" onclick="switchTab('settings')">
+        <button class="sidebar-btn" data-roles="superadmin" onclick="switchTab('admins')">
+          <span class="sidebar-icon">👥</span>
+          <span>Manage Admins</span>
+        </button>
+        <button class="sidebar-btn" data-roles="superadmin" onclick="switchTab('settings')">
           <span class="sidebar-icon">⚙️</span>
           <span>Site Settings</span>
         </button>
