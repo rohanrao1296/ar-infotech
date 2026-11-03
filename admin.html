@@ -705,6 +705,7 @@
     <div class="admin-body">
       <!-- Sidebar -->
       <aside class="admin-sidebar">
+        <div id="sidebar-role-indicator" style="margin-bottom: 0.75rem;"></div>
         <button class="sidebar-btn active" data-roles="superadmin" onclick="switchTab('overview')">
           <span class="sidebar-icon">📊</span>
           <span>Overview</span>
@@ -1476,6 +1477,46 @@
     let currentProjects = [];
     let currentSettings = {};
 
+    // Helper: Authenticated fetch passing Authorization Bearer header
+    function authFetch(url, options = {}) {
+      const token = localStorage.getItem('ar_admin_token') || authToken;
+      const headers = { ...(options.headers || {}) };
+      if (token) {
+        headers['Authorization'] = 'Bearer ' + token;
+      }
+      return fetch(url, { ...options, headers });
+    }
+
+    // Helper: Safely resolve current user and role
+    function getCurrentUser() {
+      // 1. Try reading from localStorage
+      try {
+        const raw = localStorage.getItem('ar_admin_user');
+        if (raw) {
+          const u = JSON.parse(raw);
+          if (u && u.username && u.role) return u;
+        }
+      } catch (e) {}
+
+      // 2. Fallback: decode directly from authToken (AR_AUTH_<base64>)
+      try {
+        const tok = localStorage.getItem('ar_admin_token') || authToken;
+        if (tok && tok.startsWith('AR_AUTH_')) {
+          const b64 = tok.replace('AR_AUTH_', '');
+          const str = atob(b64);
+          const parts = str.split(':');
+          if (parts.length >= 2) {
+            const u = { username: parts[0], role: parts[1].toLowerCase(), name: parts[0] };
+            localStorage.setItem('ar_admin_user', JSON.stringify(u));
+            return u;
+          }
+        }
+      } catch (e) {}
+
+      // 3. Safe fallback: Restricted admin, NEVER superadmin
+      return { username: 'staff', role: 'admin', name: 'Staff Admin' };
+    }
+
     // BroadcastChannel for instant cross-tab live updates
     let syncChannel = null;
     try {
@@ -1502,7 +1543,8 @@
         .then(data => {
           if (data.success && data.connected) {
             document.getElementById('db-status-text').innerText = data.engine === 'MongoDB' ? 'MongoDB Connected' : 'Database Active & Ready';
-            document.getElementById('db-health-dump').innerText = JSON.stringify(data, null, 2);
+            const dump = document.getElementById('db-health-dump');
+            if (dump) dump.innerText = JSON.stringify(data, null, 2);
           } else {
             document.getElementById('db-status-text').innerText = 'DB Offline / Fallback';
           }
@@ -1511,7 +1553,7 @@
         });
     });
 
-    // Login Form
+    // Login Form Handler
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const user = document.getElementById('login-user').value.trim();
@@ -1530,8 +1572,16 @@
         if (data.success && data.token) {
           authToken = data.token;
           localStorage.setItem('ar_admin_token', authToken);
+          if (data.user) {
+            localStorage.setItem('ar_admin_user', JSON.stringify(data.user));
+          } else {
+            // Decode role from token if user object missing
+            getCurrentUser();
+          }
           showAdminApp();
-          showToast('Welcome back, Admin!');
+          const userObj = getCurrentUser();
+          const isSuper = (userObj.role === 'superadmin');
+          showToast('Welcome, ' + (userObj.name || userObj.username) + ' (' + (isSuper ? 'Super Admin' : 'Staff Admin') + ')');
         } else {
           errBox.innerText = data.error || 'Invalid credentials';
           errBox.style.display = 'block';
@@ -1551,29 +1601,57 @@
       document.getElementById('login-view').style.display = 'none';
       document.getElementById('admin-app').style.display = 'flex';
 
-      const currentUser = JSON.parse(localStorage.getItem('ar_admin_user') || '{"role":"superadmin","username":"admin"}');
+      const currentUser = getCurrentUser();
       const isSuperAdmin = (currentUser.role === 'superadmin');
 
       // Update Header Badge
       const badge = document.getElementById('admin-user-badge');
       if (badge) {
-        badge.innerHTML = isSuperAdmin 
-          ? `⭐ <strong>Super Admin</strong> (${escapeHtml(currentUser.username)})` 
-          : `👤 <strong>Admin</strong> (${escapeHtml(currentUser.username)})`;
-        badge.className = isSuperAdmin ? 'user-role-badge badge-superadmin' : 'user-role-badge badge-admin-role';
+        if (isSuperAdmin) {
+          badge.innerHTML = '⭐ <strong>Super Admin</strong> (' + escapeHtml(currentUser.username) + ')';
+          badge.className = 'user-role-badge badge-superadmin';
+        } else {
+          badge.innerHTML = '👤 <strong>Staff Admin</strong>: ' + escapeHtml(currentUser.name || currentUser.username);
+          badge.className = 'user-role-badge badge-admin-role';
+        }
       }
 
-      // Filter sidebar buttons based on role
-      document.querySelectorAll('.sidebar-btn').forEach(btn => {
-        const roles = btn.getAttribute('data-roles') || 'superadmin,admin';
-        if (!roles.includes(currentUser.role)) {
-          btn.style.display = 'none';
+      // Update Sidebar Role Banner
+      const roleBanner = document.getElementById('sidebar-role-indicator');
+      if (roleBanner) {
+        if (isSuperAdmin) {
+          roleBanner.innerHTML = `
+            <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 8px; padding: 0.65rem 0.85rem;">
+              <div style="font-size: 0.82rem; font-weight: 800; color: #b45309; display: flex; align-items: center; gap: 0.4rem;">
+                <span>⭐</span> Super Admin Portal
+              </div>
+              <div style="font-size: 0.71rem; color: #78350f; margin-top: 2px;">Full Master Control (All Tabs &amp; Settings)</div>
+            </div>
+          `;
         } else {
-          btn.style.display = 'flex';
+          roleBanner.innerHTML = `
+            <div style="background: rgba(2, 132, 199, 0.12); border: 1px solid rgba(2, 132, 199, 0.35); border-radius: 8px; padding: 0.65rem 0.85rem;">
+              <div style="font-size: 0.82rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 0.4rem;">
+                <span>📋</span> Operations Panel
+              </div>
+              <div style="font-size: 0.71rem; color: var(--text-muted); margin-top: 2px;">Restricted: Admissions CRM &amp; Certificates Only</div>
+            </div>
+          `;
+        }
+      }
+
+      // Filter sidebar buttons strictly based on role
+      document.querySelectorAll('.sidebar-btn').forEach(btn => {
+        const rolesAttr = btn.getAttribute('data-roles') || 'superadmin,admin';
+        const allowedRoles = rolesAttr.split(',').map(r => r.trim().toLowerCase());
+        if (!allowedRoles.includes(currentUser.role.toLowerCase())) {
+          btn.style.setProperty('display', 'none', 'important');
+        } else {
+          btn.style.setProperty('display', 'flex', 'important');
         }
       });
 
-      // Default landing tab based on role
+      // Default landing tab strictly based on role
       if (!isSuperAdmin) {
         switchTab('inquiries');
       } else {
@@ -1591,12 +1669,12 @@
       showToast('Logged out successfully');
     }
 
-    // Switch Sidebar Tab
+    // Switch Sidebar Tab with Strict RBAC Lock
     function switchTab(tabId) {
-      const currentUser = JSON.parse(localStorage.getItem('ar_admin_user') || '{"role":"superadmin","username":"admin"}');
+      const currentUser = getCurrentUser();
       const isSuperAdmin = (currentUser.role === 'superadmin');
 
-      // Security check: restrict regular admins to CRM and Certificates
+      // Strict Security: Regular admins can ONLY access Admissions CRM ('inquiries') and Certificates ('certificates')
       if (!isSuperAdmin && tabId !== 'inquiries' && tabId !== 'certificates') {
         showToast('⚠️ Access restricted to Super Admin');
         tabId = 'inquiries';
@@ -1614,27 +1692,29 @@
       });
       if (activeBtn) activeBtn.classList.add('active');
 
-      // If switching to Manage Admins, load users immediately!
-      if (tabId === 'admins') {
+      // If switching to Manage Admins, load users immediately (Super Admin only)!
+      if (tabId === 'admins' && isSuperAdmin) {
         loadAdminUsers();
       }
     }
 
-    // Load All Data
+    // Load All Data strictly based on role
     async function loadAllAdminData() {
-      const currentUser = JSON.parse(localStorage.getItem('ar_admin_user') || '{"role":"superadmin","username":"admin"}');
+      const currentUser = getCurrentUser();
       const isSuperAdmin = (currentUser.role === 'superadmin');
 
+      // Both Super Admin and Staff Admin need CRM and Certificates
       const tasks = [
         loadInquiries(),
         loadCertificates()
       ];
 
+      // ONLY Super Admin loads Faculty, Projects, Settings, and Admin Accounts
       if (isSuperAdmin) {
         tasks.push(loadSiteData(), loadSettings(), loadAdminUsers());
       }
 
-      await Promise.all(tasks);
+      await Promise.allSettled(tasks);
     }
 
     // Load Site Data (Trainers & Projects)
@@ -1763,7 +1843,7 @@
       };
 
       try {
-        const res = await fetch('/api/admin/trainers', {
+        const res = await authFetch('/api/admin/trainers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -1783,7 +1863,7 @@
     async function deleteTrainer(id) {
       if (!confirm('Are you sure you want to remove this faculty member?')) return;
       try {
-        const res = await fetch(`/api/admin/trainers?id=${id}`, { method: 'DELETE' });
+        const res = await authFetch(`/api/admin/trainers?id=${id}`, { method: 'DELETE' });
         const data = await res.json();
         if (data.success) {
           showToast('Faculty removed! Synced to frontend.');
@@ -1865,7 +1945,7 @@
       };
 
       try {
-        const res = await fetch('/api/admin/projects', {
+        const res = await authFetch('/api/admin/projects', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -1885,7 +1965,7 @@
     async function deleteProject(id) {
       if (!confirm('Are you sure you want to delete this project?')) return;
       try {
-        const res = await fetch(`/api/admin/projects?id=${id}`, { method: 'DELETE' });
+        const res = await authFetch(`/api/admin/projects?id=${id}`, { method: 'DELETE' });
         const data = await res.json();
         if (data.success) {
           showToast('Project deleted! Synced to frontend.');
@@ -2039,7 +2119,7 @@
     // Site Settings
     async function loadSettings() {
       try {
-        const res = await fetch('/api/admin/settings');
+        const res = await authFetch('/api/admin/settings');
         const data = await res.json();
         if (data.success && data.settings) {
           const s = data.settings;
@@ -2065,7 +2145,7 @@
       if (newPass) payload.adminPassword = newPass;
 
       try {
-        const res = await fetch('/api/admin/settings', {
+        const res = await authFetch('/api/admin/settings', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -2089,7 +2169,7 @@
       reader.onload = async () => {
         const base64 = reader.result;
         try {
-          const res = await fetch('/api/admin/upload-image', {
+          const res = await authFetch('/api/admin/upload-image', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ filename: file.name, base64 })
@@ -2129,7 +2209,7 @@
       if (!tbody) return;
       tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading admin accounts...</td></tr>';
       try {
-        const res = await fetch('/api/admin/sub-admins?_t=' + Date.now());
+        const res = await authFetch('/api/admin/sub-admins?_t=' + Date.now());
         const data = await res.json();
         if (data.success && Array.isArray(data.users)) {
           if (data.users.length === 0) {
@@ -2178,7 +2258,7 @@
       btn.innerText = 'Creating Account...';
 
       try {
-        const res = await fetch('/api/admin/sub-admins', {
+        const res = await authFetch('/api/admin/sub-admins', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, username, password })
@@ -2205,7 +2285,7 @@
       }
 
       try {
-        const res = await fetch('/api/admin/sub-admins?username=' + encodeURIComponent(username), {
+        const res = await authFetch('/api/admin/sub-admins?username=' + encodeURIComponent(username), {
           method: 'DELETE'
         });
         const data = await res.json();

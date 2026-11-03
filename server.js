@@ -43,6 +43,22 @@ function parseJsonBody(req) {
 }
 
 // Helper: Send JSON Response
+function getAuthUser(req) {
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+  if (token && token.startsWith('AR_AUTH_')) {
+    try {
+      const b64 = token.replace('AR_AUTH_', '');
+      const str = Buffer.from(b64, 'base64').toString('utf8');
+      const parts = str.split(':');
+      if (parts.length >= 2) {
+        return { username: parts[0], role: (parts[1] || 'admin').toLowerCase() };
+      }
+    } catch (e) {}
+  }
+  return null;
+}
+
 function sendJson(res, statusCode, data) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
@@ -235,6 +251,10 @@ const server = http.createServer(async (req, res) => {
   // 10. Admin: Manage Trainers (GET, POST, DELETE)
   if (pathname === '/api/admin/trainers') {
     try {
+      const authUser = getAuthUser(req);
+      if ((req.method === 'POST' || req.method === 'DELETE') && authUser && authUser.role !== 'superadmin') {
+        return sendJson(res, 403, { success: false, error: 'Forbidden: Super Admin privileges required' });
+      }
       if (req.method === 'GET') {
         const trainers = await db.getTrainers();
         return sendJson(res, 200, { success: true, trainers });
@@ -261,6 +281,10 @@ const server = http.createServer(async (req, res) => {
   // 11. Admin: Manage Projects (GET, POST, DELETE)
   if (pathname === '/api/admin/projects') {
     try {
+      const authUser = getAuthUser(req);
+      if ((req.method === 'POST' || req.method === 'DELETE') && authUser && authUser.role !== 'superadmin') {
+        return sendJson(res, 403, { success: false, error: 'Forbidden: Super Admin privileges required' });
+      }
       if (req.method === 'GET') {
         const projects = await db.getProjects();
         return sendJson(res, 200, { success: true, projects });
@@ -287,6 +311,10 @@ const server = http.createServer(async (req, res) => {
   // 12. Admin: Manage Settings (GET, POST)
   if (pathname === '/api/admin/settings') {
     try {
+      const authUser = getAuthUser(req);
+      if (req.method === 'POST' && authUser && authUser.role !== 'superadmin') {
+        return sendJson(res, 403, { success: false, error: 'Forbidden: Super Admin privileges required' });
+      }
       if (req.method === 'GET') {
         const settings = await db.getSettings();
         return sendJson(res, 200, { success: true, settings });
@@ -370,6 +398,10 @@ const server = http.createServer(async (req, res) => {
   // 16. Sub-Admin User Management (Super Admin)
   if (pathname === '/api/admin/sub-admins') {
     try {
+      const authUser = getAuthUser(req);
+      if (authUser && authUser.role !== 'superadmin') {
+        return sendJson(res, 403, { success: false, error: 'Forbidden: Super Admin privileges required to manage staff accounts' });
+      }
       if (req.method === 'GET') {
         const users = await db.getAdminUsers();
         return sendJson(res, 200, { success: true, users });
