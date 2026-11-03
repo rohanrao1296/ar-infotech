@@ -9,7 +9,8 @@ try {
   dns.setServers(['8.8.8.8', '1.1.1.1']);
 } catch (e) {}
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
+const ATLAS_FALLBACK_URI = 'mongodb+srv://rohankumar4088_db_user:mnwBITZAE6MUd0FF@cluster0.ztflnvt.mongodb.net/arinfotech?retryWrites=true&w=majority';
+const MONGODB_URI = process.env.MONGODB_URI || ATLAS_FALLBACK_URI;
 const DB_NAME = process.env.DB_NAME || 'arinfotech';
 
 let client = null;
