@@ -210,27 +210,22 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  // 9. Admin Login
+  // 9. Admin Login (Super Admin & Sub-Admin Roles)
   if (pathname === '/api/admin/login' && req.method === 'POST') {
     try {
       const body = await parseJsonBody(req);
-      const settings = await db.getSettings();
-      const validUser = settings.adminUsername || 'admin';
-      const validPass = settings.adminPassword || 'admin@arinfotech2026';
+      const auth = await db.authenticateUser(body.username, body.password);
 
-      const userMatch = (body.username === validUser || body.username === 'rohan');
-      const passMatch = (body.password === validPass);
-
-      if (userMatch && passMatch) {
-        const token = 'AR_AUTH_' + Buffer.from(`${body.username}:${Date.now()}`).toString('base64');
+      if (auth.success && auth.user) {
+        const token = 'AR_AUTH_' + Buffer.from(`${auth.user.username}:${auth.user.role}:${Date.now()}`).toString('base64');
         return sendJson(res, 200, {
           success: true,
           token,
-          user: { username: body.username, role: 'Super Admin' },
-          message: 'Admin authorization successful'
+          user: auth.user,
+          message: `${auth.user.role === 'superadmin' ? 'Super Admin' : 'Admin'} authorization successful`
         });
       } else {
-        return sendJson(res, 401, { success: false, error: 'Incorrect username or password' });
+        return sendJson(res, 401, { success: false, error: auth.error || 'Incorrect username or password' });
       }
     } catch (err) {
       return sendJson(res, 500, { success: false, error: err.message });
@@ -369,6 +364,31 @@ const server = http.createServer(async (req, res) => {
       });
     } catch (err) {
       return sendJson(res, 500, { success: false, error: err.message });
+    }
+  }
+
+  // 16. Sub-Admin User Management (Super Admin)
+  if (pathname === '/api/admin/sub-admins') {
+    try {
+      if (req.method === 'GET') {
+        const users = await db.getAdminUsers();
+        return sendJson(res, 200, { success: true, users });
+      }
+
+      if (req.method === 'POST') {
+        const body = await parseJsonBody(req);
+        const result = await db.createAdminUser(body);
+        return sendJson(res, 201, result);
+      }
+
+      if (req.method === 'DELETE') {
+        const username = parsedUrl.searchParams.get('username');
+        if (!username) return sendJson(res, 400, { success: false, error: 'Username is required' });
+        const result = await db.deleteAdminUser(username);
+        return sendJson(res, 200, result);
+      }
+    } catch (err) {
+      return sendJson(res, 400, { success: false, error: err.message });
     }
   }
 

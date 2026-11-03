@@ -269,7 +269,8 @@ function ensureJsonDb() {
         certificates: SEED_CERTIFICATES,
         inquiries: [],
         subscribers: [],
-        career_leads: []
+        career_leads: [],
+        admin_users: []
       };
       fs.writeFileSync(DATA_FILE, JSON.stringify(initialData, null, 2), 'utf8');
     }
@@ -290,7 +291,8 @@ function readJsonDb() {
       certificates: Array.isArray(parsed.certificates) ? parsed.certificates : SEED_CERTIFICATES,
       inquiries: Array.isArray(parsed.inquiries) ? parsed.inquiries : [],
       subscribers: Array.isArray(parsed.subscribers) ? parsed.subscribers : [],
-      career_leads: Array.isArray(parsed.career_leads) ? parsed.career_leads : []
+      career_leads: Array.isArray(parsed.career_leads) ? parsed.career_leads : [],
+      admin_users: Array.isArray(parsed.admin_users) ? parsed.admin_users : []
     };
   } catch (err) {
     console.error('[FileDB] Read error:', err.message);
@@ -301,7 +303,8 @@ function readJsonDb() {
       certificates: SEED_CERTIFICATES,
       inquiries: [],
       subscribers: [],
-      career_leads: []
+      career_leads: [],
+      admin_users: []
     };
   }
 }
@@ -377,6 +380,7 @@ async function setupCollectionsAndIndexes() {
     if (!existingNames.includes('trainers')) await db.createCollection('trainers');
     if (!existingNames.includes('projects')) await db.createCollection('projects');
     if (!existingNames.includes('settings')) await db.createCollection('settings');
+    if (!existingNames.includes('admin_users')) await db.createCollection('admin_users');
 
     await db.collection('inquiries').createIndex({ refId: 1 }, { unique: true });
     await db.collection('inquiries').createIndex({ phone: 1 });
@@ -392,6 +396,7 @@ async function setupCollectionsAndIndexes() {
     await db.collection('projects').createIndex({ order: 1 });
 
     await db.collection('settings').createIndex({ settingsId: 1 }, { unique: true });
+    await db.collection('admin_users').createIndex({ username: 1 }, { unique: true });
   } catch (err) {
     console.error('[MongoDB Init Index Warning]', err.message);
   }
@@ -841,6 +846,125 @@ async function getDbStatus() {
   }
 }
 
+// =========================================================================
+// SUB-ADMIN USER MANAGEMENT & AUTHENTICATION
+// =========================================================================
+async function getAdminUsers() {
+  const database = await connectDB();
+  if (database) {
+    try {
+      const users = await database.collection('admin_users').find({}).sort({ createdAt: -1 }).toArray();
+      return users.map(u => ({
+        username: u.username,
+        name: u.name,
+        role: u.role || 'admin',
+        createdAt: u.createdAt,
+        password: u.password
+      }));
+    } catch (e) {
+      console.error('[getAdminUsers MongoDB error]', e.message);
+    }
+  }
+  const store = readJsonDb();
+  store.admin_users = store.admin_users || [];
+  return store.admin_users;
+}
+
+async function createAdminUser({ username, password, name }) {
+  const cleanUser = (username || '').toLowerCase().trim();
+  const cleanPass = (password || '').trim();
+  if (!cleanUser || !cleanPass) {
+    throw new Error('Username and password are required');
+  }
+  if (cleanUser === 'admin' || cleanUser === 'rohan') {
+    throw new Error('Username "admin" is reserved for Super Admin');
+  }
+
+  const existing = await getAdminUsers();
+  if (existing.some(u => u.username.toLowerCase() === cleanUser)) {
+    throw new Error(`Username "${cleanUser}" already exists. Please choose another username.`);
+  }
+
+  const newUser = {
+    username: cleanUser,
+    password: cleanPass,
+    name: (name || cleanUser).trim(),
+    role: 'admin',
+    createdAt: new Date()
+  };
+
+  const database = await connectDB();
+  if (database) {
+    try {
+      await database.collection('admin_users').insertOne({ ...newUser });
+    } catch (e) {
+      console.error('[createAdminUser MongoDB error]', e.message);
+    }
+  }
+
+  const store = readJsonDb();
+  store.admin_users = store.admin_users || [];
+  store.admin_users.push({ ...newUser, createdAt: newUser.createdAt.toISOString() });
+  writeJsonDb(store);
+
+  return { success: true, user: newUser };
+}
+
+async function deleteAdminUser(username) {
+  const cleanUser = (username || '').toLowerCase().trim();
+  const database = await connectDB();
+  if (database) {
+    try {
+      await database.collection('admin_users').deleteOne({ username: cleanUser });
+    } catch (e) {
+      console.error('[deleteAdminUser MongoDB error]', e.message);
+    }
+  }
+
+  const store = readJsonDb();
+  store.admin_users = (store.admin_users || []).filter(u => u.username.toLowerCase() !== cleanUser);
+  writeJsonDb(store);
+
+  return { success: true };
+}
+
+async function authenticateUser(username, password) {
+  const cleanUser = (username || '').toLowerCase().trim();
+  const cleanPass = (password || '').trim();
+
+  // 1. Super Admin Authentication
+  const settings = await getSettings();
+  const validSuperUser = (settings.adminUsername || 'admin').toLowerCase().trim();
+  const validSuperPass = (settings.adminPassword || 'admin@arinfotech2026').trim();
+
+  if ((cleanUser === validSuperUser || cleanUser === 'rohan') && cleanPass === validSuperPass) {
+    return {
+      success: true,
+      user: {
+        username: cleanUser,
+        name: 'Super Admin',
+        role: 'superadmin'
+      }
+    };
+  }
+
+  // 2. Sub-Admin Authentication
+  const subAdmins = await getAdminUsers();
+  const found = subAdmins.find(u => u.username.toLowerCase() === cleanUser && u.password === cleanPass);
+  if (found) {
+    return {
+      success: true,
+      user: {
+        username: found.username,
+        name: found.name || found.username,
+        role: 'admin'
+      }
+    };
+  }
+
+  return { success: false, error: 'Incorrect username or password' };
+}
+
 module.exports = {
   connectDB,
   saveInquiry,
@@ -861,5 +985,9 @@ module.exports = {
   saveProject,
   deleteProject,
   getSettings,
-  saveSettings
+  saveSettings,
+  getAdminUsers,
+  createAdminUser,
+  deleteAdminUser,
+  authenticateUser
 };

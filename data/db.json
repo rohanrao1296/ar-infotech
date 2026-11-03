@@ -257,5 +257,14 @@
   ],
   "inquiries": [],
   "subscribers": [],
-  "career_leads": []
+  "career_leads": [],
+  "admin_users": [
+    {
+      "username": "admission_counselor",
+      "password": "counselor@2026",
+      "name": "Rohan Counselor",
+      "role": "admin",
+      "createdAt": "2026-11-03T06:47:51.426Z"
+    }
+  ]
 }

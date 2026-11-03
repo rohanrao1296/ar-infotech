@@ -274,6 +274,28 @@
     }
 
     /* Main Layout */
+    
+    .user-role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .badge-superadmin {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      color: #92400e;
+      border: 1px solid #f59e0b;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+    }
+    .badge-admin-role {
+      background: rgba(0, 82, 204, 0.08);
+      color: var(--primary);
+      border: 1px solid rgba(0, 82, 204, 0.25);
+    }
+
     .admin-body {
       display: flex;
       flex: 1;
@@ -643,6 +665,9 @@
         </div>
       </div>
       <div class="nav-actions">
+        <div class="user-role-badge badge-superadmin" id="admin-user-badge">
+          ⭐ Super Admin (admin)
+        </div>
         <div class="status-pill">
           <span class="status-dot"></span>
           <span id="db-status-text">MongoDB Connected</span>
@@ -881,6 +906,52 @@
           </div>
         </section>
 
+      
+        <!-- ==========================================
+             TAB 7: MANAGE ADMIN ACCOUNTS (SUPER ADMIN ONLY)
+             ========================================== -->
+        <section id="tab-admins" class="tab-pane">
+          <div class="pane-header">
+            <div>
+              <h2>👥 Manage Admin Accounts &amp; Staff Roles</h2>
+              <p>Create and control admin accounts with operational access restricted strictly to Admissions CRM and Certificates.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openAdminUserModal()">
+              <span>➕ Create New Admin Account</span>
+            </button>
+          </div>
+
+          <div class="pane-card" style="margin-bottom: 2rem;">
+            <div style="background: rgba(0, 82, 204, 0.05); border: 1.5px dashed var(--primary); padding: 1.25rem 1.5rem; border-radius: var(--radius-lg); margin-bottom: 1.5rem;">
+              <h4 style="color: var(--primary); font-size: 1.05rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🛡️ Role-Based Access Control (RBAC) System</span>
+              </h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.55;">
+                • <strong>Super Admin (You):</strong> Unrestricted master access. Full control over Faculty order/stats, Software projects, Sub-Admin staff accounts, and Global site settings.<br>
+                • <strong>Admin (Created below):</strong> Operational access limited strictly to <strong>📋 Admissions CRM</strong> and <strong>📜 Certificates Registry</strong>. All other tabs, settings, and faculty management are completely hidden from their login.
+              </p>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                    <th>Permissions</th>
+                    <th>Created Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading admin accounts...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -1685,6 +1756,135 @@
       toast.style.display = 'block';
       setTimeout(() => { toast.style.display = 'none'; }, 3200);
     }
+
+    // --- Sub-Admin Management Functions ---
+    async function loadAdminUsers() {
+      const tbody = document.getElementById('adminUsersTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading admin accounts...</td></tr>';
+      try {
+        const res = await fetch('/api/admin/sub-admins?_t=' + Date.now());
+        const data = await res.json();
+        if (data.success && Array.isArray(data.users)) {
+          if (data.users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No sub-admin accounts created yet. Click "+ Create New Admin Account" above to add staff with Admissions CRM & Certificates access.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.users.map(u => `
+            <tr>
+              <td><strong>${escapeHtml(u.name || u.username)}</strong></td>
+              <td><code>${escapeHtml(u.username)}</code></td>
+              <td><code>${escapeHtml(u.password)}</code></td>
+              <td><span class="user-role-badge badge-admin-role">👤 Admin</span></td>
+              <td><span style="font-size: 0.8rem; color: var(--success); font-weight: 700;">📋 CRM + 📜 Certs</span></td>
+              <td><small>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}</small></td>
+              <td>
+                <button class="btn btn-outline btn-sm" style="color: var(--danger); border-color: rgba(239, 68, 68, 0.3);" onclick="deleteAdminUserAccount('${escapeHtml(u.username)}')">
+                  🗑️ Remove
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--danger);">Failed to load admin accounts: ${err.message}</td></tr>`;
+      }
+    }
+
+    function openAdminUserModal() {
+      document.getElementById('admin-user-form').reset();
+      openModal('admin-user-modal');
+    }
+
+    async function saveAdminUserData(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-admin-name').value.trim();
+      const username = document.getElementById('new-admin-username').value.trim();
+      const password = document.getElementById('new-admin-password').value.trim();
+      const btn = document.getElementById('save-admin-user-btn');
+
+      if (!username || !password) {
+        showToast('⚠️ Please enter username and password');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Creating Account...';
+
+      try {
+        const res = await fetch('/api/admin/sub-admins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, username, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`✅ Admin account "${username}" created successfully!`);
+          closeModal('admin-user-modal');
+          loadAdminUsers();
+        } else {
+          showToast(`❌ Error: ${data.error || 'Failed to create admin'}`);
+        }
+      } catch (err) {
+        showToast(`❌ Network error: ${err.message}`);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Create Admin Account';
+      }
+    }
+
+    async function deleteAdminUserAccount(username) {
+      if (!confirm(`Are you sure you want to remove the admin account "${username}"? They will no longer be able to log in.`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/admin/sub-admins?username=' + encodeURIComponent(username), {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`🗑️ Admin account "${username}" deleted`);
+          loadAdminUsers();
+        } else {
+          showToast(`❌ Error: ${data.error || 'Failed to delete'}`);
+        }
+      } catch (err) {
+        showToast(`❌ Network error: ${err.message}`);
+      }
+    }
   </script>
+
+  <!-- 4. Sub-Admin User Modal -->
+  <div class="modal-backdrop" id="admin-user-modal">
+    <div class="modal-box" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 id="admin-user-modal-title">➕ Create Admin Account</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('admin-user-modal')">✕</button>
+      </div>
+      <form id="admin-user-form" onsubmit="saveAdminUserData(event)">
+        <div class="form-group">
+          <label class="form-label">Full Name / Staff Designation</label>
+          <input type="text" id="new-admin-name" class="form-control" placeholder="e.g. Admission Desk - Counselor" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Username (Login ID)</label>
+          <input type="text" id="new-admin-username" class="form-control" placeholder="e.g. counselor / admission1" required>
+          <small style="color: var(--text-muted); font-size: 0.75rem;">This username will log in at /admin</small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="text" id="new-admin-password" class="form-control" placeholder="Enter secure password" required>
+        </div>
+        <div style="background: var(--bg-surface); padding: 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border); font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          📌 <strong>Allowed Access Scope:</strong> This account will only be able to view and manage <strong>Admissions CRM</strong> and <strong>Certificates</strong>.
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="btn btn-outline" onclick="closeModal('admin-user-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="save-admin-user-btn">Create Admin Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </body>
 </html>
