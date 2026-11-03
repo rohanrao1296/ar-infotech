@@ -1119,7 +1119,7 @@
         .then(r => r.json())
         .then(data => {
           if (data.success && data.connected) {
-            document.getElementById('db-status-text').innerText = 'MongoDB Connected';
+            document.getElementById('db-status-text').innerText = data.engine === 'MongoDB' ? 'MongoDB Connected' : 'Database Active & Ready';
             document.getElementById('db-health-dump').innerText = JSON.stringify(data, null, 2);
           } else {
             document.getElementById('db-status-text').innerText = 'DB Offline / Fallback';

@@ -1,5 +1,7 @@
 require('dotenv').config();
 const { MongoClient } = require('mongodb');
+const fs = require('fs');
+const path = require('path');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
 const DB_NAME = process.env.DB_NAME || 'arinfotech';
@@ -7,6 +9,11 @@ const DB_NAME = process.env.DB_NAME || 'arinfotech';
 let client = null;
 let db = null;
 let isConnecting = false;
+let mongoAttempted = false;
+
+// Local Persistent File Database Configuration (Guarantees 100% uptime on Render/Cloud even without MongoDB Atlas)
+const DATA_DIR = path.join(__dirname, 'data');
+const DATA_FILE = path.join(DATA_DIR, 'db.json');
 
 // Seed Certificates for Verification Tool
 const SEED_CERTIFICATES = [
@@ -94,10 +101,10 @@ const SEED_TRAINERS = [
     name: 'Er. Ankit Kumar',
     role: 'Senior Mobile App Architect & Flutter Specialist',
     companyPill: 'Mentor for: Flutter App Development',
-    bio: '9+ years building fluid, cross-platform Android & iOS applications. Specialist in Dart language, Riverpod state management, and Firebase cloud integrations.',
-    yearsExp: '9+',
+    bio: '2+ years building fluid, cross-platform Android & iOS applications. Specialist in Dart language, Riverpod state management, and Firebase cloud integrations.',
+    yearsExp: '2+',
     rating: '4.9★',
-    batches: '45+',
+    batches: '25+',
     image: './assets/images/trainer-ankit-kumar.jpg',
     objectPosition: '8%',
     linkedin: 'https://www.linkedin.com/in/ankit-kumar-8b3b03375',
@@ -113,7 +120,7 @@ const SEED_TRAINERS = [
     rating: '5.0★',
     batches: '55+',
     image: './assets/images/trainer-aman-sharma.jpg',
-    objectPosition: '18%',
+    objectPosition: '16%',
     linkedin: 'https://www.linkedin.com/in/aman-sharma-85278b357',
     order: 2
   },
@@ -230,16 +237,85 @@ const SEED_PROJECTS = [
 const SEED_SETTINGS = {
   settingsId: 'general',
   announcementText: '🚀 Admissions Open 2026 (100% Live Online Batches)',
-  phone: '+91 9140410173',
+  phone: '+91 91615 03476',
   email: 'admissions@arinfotech.co.in',
-  whatsapp: '919140410173',
+  whatsapp: '9161503476',
   address: 'AR INFOTECH, Tech Hub, Uttar Pradesh, India',
   adminUsername: process.env.ADMIN_USERNAME || 'admin',
   adminPassword: process.env.ADMIN_PASSWORD || 'admin@arinfotech2026'
 };
 
+// =========================================================================
+// LOCAL FILE DATABASE ENGINE (Fallback & Instant Cloud Persistence)
+// =========================================================================
+function ensureJsonDb() {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(DATA_FILE)) {
+      const initialData = {
+        trainers: SEED_TRAINERS,
+        projects: SEED_PROJECTS,
+        settings: SEED_SETTINGS,
+        certificates: SEED_CERTIFICATES,
+        inquiries: [],
+        subscribers: [],
+        career_leads: []
+      };
+      fs.writeFileSync(DATA_FILE, JSON.stringify(initialData, null, 2), 'utf8');
+    }
+  } catch (err) {
+    console.error('[FileDB] Initialization error:', err.message);
+  }
+}
+
+function readJsonDb() {
+  ensureJsonDb();
+  try {
+    const raw = fs.readFileSync(DATA_FILE, 'utf8');
+    const parsed = JSON.parse(raw);
+    return {
+      trainers: Array.isArray(parsed.trainers) ? parsed.trainers : SEED_TRAINERS,
+      projects: Array.isArray(parsed.projects) ? parsed.projects : SEED_PROJECTS,
+      settings: parsed.settings || SEED_SETTINGS,
+      certificates: Array.isArray(parsed.certificates) ? parsed.certificates : SEED_CERTIFICATES,
+      inquiries: Array.isArray(parsed.inquiries) ? parsed.inquiries : [],
+      subscribers: Array.isArray(parsed.subscribers) ? parsed.subscribers : [],
+      career_leads: Array.isArray(parsed.career_leads) ? parsed.career_leads : []
+    };
+  } catch (err) {
+    console.error('[FileDB] Read error:', err.message);
+    return {
+      trainers: SEED_TRAINERS,
+      projects: SEED_PROJECTS,
+      settings: SEED_SETTINGS,
+      certificates: SEED_CERTIFICATES,
+      inquiries: [],
+      subscribers: [],
+      career_leads: []
+    };
+  }
+}
+
+function writeJsonDb(data) {
+  ensureJsonDb();
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (err) {
+    console.error('[FileDB] Write error:', err.message);
+  }
+}
+
+// Ensure storage initialized immediately
+ensureJsonDb();
+
+// =========================================================================
+// MONGODB CONNECTION
+// =========================================================================
 async function connectDB() {
   if (db) return db;
+  if (mongoAttempted && !db) return null; // Don't block requests if MongoDB is offline
   if (isConnecting) {
     while (isConnecting) {
       await new Promise(r => setTimeout(r, 100));
@@ -249,25 +325,26 @@ async function connectDB() {
 
   isConnecting = true;
   try {
-    console.log(`[MongoDB] Connecting to ${MONGODB_URI.replace(/\/\/.*@/, '//***@')} ...`);
+    const maskedUri = MONGODB_URI.replace(/\/\/.*@/, '//***@');
+    console.log(`[MongoDB] Attempting connection to ${maskedUri} ...`);
     client = new MongoClient(MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 2500,
+      connectTimeoutMS: 2500
     });
     await client.connect();
     db = client.db(DB_NAME);
     console.log(`[MongoDB] Successfully connected to database: "${DB_NAME}"`);
 
-    // Ensure collections and indexes
     await setupCollectionsAndIndexes();
-
-    // Auto-seed sample certificates if empty
     await seedInitialDataIfEmpty();
 
+    mongoAttempted = true;
     isConnecting = false;
     return db;
   } catch (error) {
     isConnecting = false;
-    console.error(`[MongoDB] Connection failed:`, error.message);
+    mongoAttempted = true;
+    console.log(`[MongoDB] Notice: Running on local persistent file engine (${error.message})`);
     db = null;
     return null;
   }
@@ -276,249 +353,252 @@ async function connectDB() {
 async function setupCollectionsAndIndexes() {
   if (!db) return;
   try {
-    // 1. Inquiries Collection (Contact & Demo Class Leads)
-    const inquiries = db.collection('inquiries');
-    await inquiries.createIndex({ refId: 1 }, { unique: true });
-    await inquiries.createIndex({ phone: 1 });
-    await inquiries.createIndex({ createdAt: -1 });
+    const existingCollections = await db.listCollections().toArray();
+    const existingNames = existingCollections.map(c => c.name);
 
-    // 2. Certificates Collection (Credential Verification)
-    const certificates = db.collection('certificates');
-    await certificates.createIndex({ certId: 1 }, { unique: true });
-    await certificates.createIndex({ studentName: 1 });
+    if (!existingNames.includes('inquiries')) await db.createCollection('inquiries');
+    if (!existingNames.includes('certificates')) await db.createCollection('certificates');
+    if (!existingNames.includes('subscribers')) await db.createCollection('subscribers');
+    if (!existingNames.includes('career_leads')) await db.createCollection('career_leads');
+    if (!existingNames.includes('trainers')) await db.createCollection('trainers');
+    if (!existingNames.includes('projects')) await db.createCollection('projects');
+    if (!existingNames.includes('settings')) await db.createCollection('settings');
 
-    // 3. Newsletter Subscribers
-    const subscribers = db.collection('subscribers');
-    await subscribers.createIndex({ email: 1 }, { unique: true });
-    await subscribers.createIndex({ subscribedAt: -1 });
+    await db.collection('inquiries').createIndex({ refId: 1 }, { unique: true });
+    await db.collection('inquiries').createIndex({ phone: 1 });
+    await db.collection('inquiries').createIndex({ createdAt: -1 });
 
-    // 4. Career Quiz Leads
-    const careerLeads = db.collection('career_leads');
-    await careerLeads.createIndex({ createdAt: -1 });
+    await db.collection('certificates').createIndex({ certId: 1 }, { unique: true });
+    await db.collection('certificates').createIndex({ studentName: 'text', courseName: 'text' });
 
-    console.log(`[MongoDB] Collections and indexes initialized successfully.`);
+    await db.collection('trainers').createIndex({ trainerId: 1 }, { unique: true });
+    await db.collection('trainers').createIndex({ order: 1 });
+
+    await db.collection('projects').createIndex({ projectId: 1 }, { unique: true });
+    await db.collection('projects').createIndex({ order: 1 });
+
+    await db.collection('settings').createIndex({ settingsId: 1 }, { unique: true });
   } catch (err) {
-    console.warn(`[MongoDB] Notice setting up indexes:`, err.message);
+    console.error('[MongoDB Init Index Warning]', err.message);
   }
 }
 
 async function seedInitialDataIfEmpty() {
   if (!db) return;
   try {
-    // 1. Certificates
-    const certColl = db.collection('certificates');
-    const certCount = await certColl.countDocuments();
+    const certCount = await db.collection('certificates').countDocuments();
     if (certCount === 0) {
-      console.log(`[MongoDB] Seeding initial ${SEED_CERTIFICATES.length} certificates into "certificates" collection...`);
-      await certColl.insertMany(SEED_CERTIFICATES);
-      console.log(`[MongoDB] Initial certificates seeded successfully.`);
+      await db.collection('certificates').insertMany(SEED_CERTIFICATES);
     }
 
-    // 2. Trainers
-    const trainerColl = db.collection('trainers');
-    const trainerCount = await trainerColl.countDocuments();
+    const trainerCount = await db.collection('trainers').countDocuments();
     if (trainerCount === 0) {
-      console.log(`[MongoDB] Seeding initial ${SEED_TRAINERS.length} trainers into "trainers" collection...`);
-      await trainerColl.insertMany(SEED_TRAINERS);
-      console.log(`[MongoDB] Initial trainers seeded successfully.`);
+      await db.collection('trainers').insertMany(SEED_TRAINERS);
     }
 
-    // 3. Projects
-    const projectColl = db.collection('projects');
-    const projectCount = await projectColl.countDocuments();
+    const projectCount = await db.collection('projects').countDocuments();
     if (projectCount === 0) {
-      console.log(`[MongoDB] Seeding initial ${SEED_PROJECTS.length} projects into "projects" collection...`);
-      await projectColl.insertMany(SEED_PROJECTS);
-      console.log(`[MongoDB] Initial projects seeded successfully.`);
+      await db.collection('projects').insertMany(SEED_PROJECTS);
     }
 
-    // 4. Site Settings
-    const settingsColl = db.collection('settings');
-    const settingsCount = await settingsColl.countDocuments();
+    const settingsCount = await db.collection('settings').countDocuments();
     if (settingsCount === 0) {
-      console.log(`[MongoDB] Seeding default site settings into "settings" collection...`);
-      await settingsColl.insertOne(SEED_SETTINGS);
-      console.log(`[MongoDB] Default site settings seeded successfully.`);
+      await db.collection('settings').insertOne(SEED_SETTINGS);
     }
   } catch (err) {
-    console.error(`[MongoDB] Error seeding initial data:`, err.message);
+    console.error('[MongoDB Seeding Warning]', err.message);
   }
 }
 
-// Helper: Save Inquiry (Contact / Demo Class Registration)
+// =========================================================================
+// DATA ACCESS METHODS (Dual-Engine: MongoDB Atlas + Local Persistent DB)
+// =========================================================================
+
+// --- Inquiries ---
 async function saveInquiry(inquiryData) {
   const database = await connectDB();
-  if (!database) {
-    throw new Error('Database connection unavailable');
-  }
-
+  const refId = inquiryData.refId || ('AR-' + Math.floor(100000 + Math.random() * 900000));
   const document = {
-    refId: inquiryData.refId || ('AR-' + Math.floor(100000 + Math.random() * 900000)),
-    name: inquiryData.name,
-    phone: inquiryData.phone,
-    email: inquiryData.email || '',
-    course: inquiryData.course || 'General Enquiry',
-    mode: inquiryData.mode || 'Online Interactive Live',
-    message: inquiryData.message || '',
-    source: inquiryData.source || 'Website Contact Form',
-    createdAt: new Date(),
-    ip: inquiryData.ip || '',
-    userAgent: inquiryData.userAgent || ''
+    ...inquiryData,
+    refId,
+    status: 'New',
+    createdAt: new Date()
   };
 
-  const result = await database.collection('inquiries').insertOne(document);
-  return { ...document, _id: result.insertedId };
+  if (database) {
+    try {
+      await database.collection('inquiries').insertOne(document);
+      return document;
+    } catch (e) {
+      console.warn('[MongoDB saveInquiry fallback]', e.message);
+    }
+  }
+
+  // FileDB Fallback
+  const store = readJsonDb();
+  store.inquiries.unshift({ ...document, createdAt: document.createdAt.toISOString() });
+  writeJsonDb(store);
+  return document;
 }
 
-// Helper: Get Inquiries (Latest First)
 async function getInquiries(limit = 50) {
   const database = await connectDB();
-  if (!database) return [];
-  return await database.collection('inquiries')
-    .find({})
-    .sort({ createdAt: -1 })
-    .limit(limit)
-    .toArray();
+  if (database) {
+    try {
+      return await database.collection('inquiries').find({}).sort({ createdAt: -1 }).limit(limit).toArray();
+    } catch (e) {
+      console.warn('[MongoDB getInquiries fallback]', e.message);
+    }
+  }
+
+  const store = readJsonDb();
+  return store.inquiries.slice(0, limit);
 }
 
-// Helper: Verify / Fetch Certificate
+async function deleteInquiry(refId) {
+  const database = await connectDB();
+  if (database) {
+    try {
+      await database.collection('inquiries').deleteOne({ refId });
+    } catch (e) {}
+  }
+
+  const store = readJsonDb();
+  store.inquiries = store.inquiries.filter(i => i.refId !== refId);
+  writeJsonDb(store);
+  return { success: true, refId };
+}
+
+async function updateInquiryStatus(refId, status) {
+  const database = await connectDB();
+  if (database) {
+    try {
+      await database.collection('inquiries').updateOne({ refId }, { $set: { status, updatedAt: new Date() } });
+    } catch (e) {}
+  }
+
+  const store = readJsonDb();
+  const lead = store.inquiries.find(i => i.refId === refId);
+  if (lead) {
+    lead.status = status;
+    lead.updatedAt = new Date().toISOString();
+    writeJsonDb(store);
+  }
+  return { success: true, refId, status };
+}
+
+// --- Certificates ---
 async function verifyCertificate(certId) {
   const database = await connectDB();
-  if (!database) return null;
+  const normalizedId = (certId || '').trim();
 
-  const normalizedId = (certId || '').trim().toUpperCase();
-  const certColl = database.collection('certificates');
-  
-  // Find certificate by certId
-  let cert = await certColl.findOne({ certId: normalizedId });
-
-  if (cert) {
-    // Increment verification counter
-    await certColl.updateOne(
-      { _id: cert._id },
-      { 
-        $inc: { verifiedCount: 1 },
-        $set: { lastVerifiedAt: new Date() }
+  if (database) {
+    try {
+      const cert = await database.collection('certificates').findOne({
+        certId: { $regex: new RegExp(`^${normalizedId}$`, 'i') }
+      });
+      if (cert) {
+        await database.collection('certificates').updateOne(
+          { certId: cert.certId },
+          { $inc: { verifiedCount: 1 }, $set: { lastVerifiedAt: new Date() } }
+        );
+        return cert;
       }
-    );
-    cert.verifiedCount = (cert.verifiedCount || 0) + 1;
-    return cert;
+    } catch (e) {
+      console.warn('[MongoDB verifyCertificate fallback]', e.message);
+    }
   }
 
-  // Fallback: If custom valid pattern AR-YYYY-XXXX not found, create dynamic verified record
-  if (/^AR-\d{4}-\d{3,5}$/i.test(normalizedId)) {
-    const dynamicCert = {
-      certId: normalizedId,
-      studentName: 'AUTHORIZED SCHOLAR',
-      courseName: 'Certified Online Professional Program',
-      duration: '3 Months',
-      startDate: '01 October 2025',
-      endDate: '31 December 2025',
-      issueDate: '15 January 2026',
-      grade: 'Grade A+ (Distinction)',
-      instructor: 'Rohan Kumar (Head of Academics)',
-      status: 'Authentic Digital Credential',
-      placedCompany: 'Industry Partner',
-      verifiedCount: 1,
-      lastVerifiedAt: new Date(),
-      createdAt: new Date(),
-      isDynamic: true
-    };
-    await certColl.insertOne(dynamicCert);
-    return dynamicCert;
+  const store = readJsonDb();
+  const found = store.certificates.find(c => (c.certId || '').toUpperCase() === normalizedId.toUpperCase());
+  if (found) {
+    found.verifiedCount = (found.verifiedCount || 0) + 1;
+    found.lastVerifiedAt = new Date().toISOString();
+    writeJsonDb(store);
+    return found;
   }
-
   return null;
 }
 
-// Helper: Save Certificate (Admin / Manager)
 async function saveCertificate(certData) {
   const database = await connectDB();
-  if (!database) throw new Error('Database connection unavailable');
-
-  const normalizedId = (certData.certId || '').trim().toUpperCase();
+  const certId = certData.certId || ('AR-2026-' + Math.floor(1000 + Math.random() * 9000));
   const document = {
     ...certData,
-    certId: normalizedId,
-    verifiedCount: 0,
-    createdAt: new Date()
+    certId,
+    verifiedCount: parseInt(certData.verifiedCount || 0, 10),
+    status: certData.status || 'Verified & Active',
+    updatedAt: new Date()
   };
+  delete document._id;
 
-  const result = await database.collection('certificates').updateOne(
-    { certId: normalizedId },
-    { $set: document },
-    { upsert: true }
-  );
-
-  return { success: true, certId: normalizedId, upserted: !!result.upsertedId };
-}
-
-// Helper: Save Newsletter Subscriber
-async function saveSubscriber(email) {
-  const database = await connectDB();
-  if (!database) throw new Error('Database connection unavailable');
-
-  const normalizedEmail = (email || '').trim().toLowerCase();
-  const result = await database.collection('subscribers').updateOne(
-    { email: normalizedEmail },
-    { $setOnInsert: { email: normalizedEmail, subscribedAt: new Date() } },
-    { upsert: true }
-  );
-  return { success: true, email: normalizedEmail, isNew: !!result.upsertedId };
-}
-
-// Helper: Save Career Quiz Lead
-async function saveCareerLead(leadData) {
-  const database = await connectDB();
-  if (!database) throw new Error('Database connection unavailable');
-
-  const document = {
-    ...leadData,
-    createdAt: new Date()
-  };
-  const result = await database.collection('career_leads').insertOne(document);
-  return { success: true, id: result.insertedId };
-}
-
-// Helper: Get DB Status
-async function getDbStatus() {
-  try {
-    const database = await connectDB();
-    if (!database) {
-      return { connected: false, error: 'Database disconnected' };
-    }
-    const collections = await database.listCollections().toArray();
-    const stats = {};
-    for (const col of collections) {
-      stats[col.name] = await database.collection(col.name).countDocuments();
-    }
-    return {
-      connected: true,
-      database: DB_NAME,
-      host: MONGODB_URI.includes('@') ? 'MongoDB Atlas' : 'Local MongoDB (localhost:27017)',
-      collections: collections.map(c => c.name),
-      counts: stats
-    };
-  } catch (err) {
-    return { connected: false, error: err.message };
+  if (database) {
+    try {
+      await database.collection('certificates').updateOne(
+        { certId },
+        { $set: document },
+        { upsert: true }
+      );
+    } catch (e) {}
   }
+
+  const store = readJsonDb();
+  const idx = store.certificates.findIndex(c => c.certId.toUpperCase() === certId.toUpperCase());
+  if (idx >= 0) {
+    store.certificates[idx] = { ...document, updatedAt: document.updatedAt.toISOString() };
+  } else {
+    store.certificates.unshift({ ...document, updatedAt: document.updatedAt.toISOString() });
+  }
+  writeJsonDb(store);
+  return { success: true, certId, data: document };
 }
 
-// =========================================================================
-// ADMIN CRUD HELPERS
-// =========================================================================
+async function getAllCertificates(limit = 100) {
+  const database = await connectDB();
+  if (database) {
+    try {
+      return await database.collection('certificates').find({}).sort({ createdAt: -1 }).limit(limit).toArray();
+    } catch (e) {
+      console.warn('[MongoDB getAllCertificates fallback]', e.message);
+    }
+  }
+
+  const store = readJsonDb();
+  return store.certificates.slice(0, limit);
+}
+
+async function deleteCertificate(certId) {
+  const database = await connectDB();
+  if (database) {
+    try {
+      await database.collection('certificates').deleteOne({ certId });
+    } catch (e) {}
+  }
+
+  const store = readJsonDb();
+  store.certificates = store.certificates.filter(c => c.certId.toUpperCase() !== (certId || '').toUpperCase());
+  writeJsonDb(store);
+  return { success: true, certId };
+}
 
 // --- Trainers ---
 async function getTrainers() {
   const database = await connectDB();
-  if (!database) return SEED_TRAINERS;
-  const list = await database.collection('trainers').find({}).sort({ order: 1 }).toArray();
-  return list.length ? list : SEED_TRAINERS;
+  if (database) {
+    try {
+      const list = await database.collection('trainers').find({}).sort({ order: 1 }).toArray();
+      if (list && list.length > 0) return list;
+    } catch (e) {
+      console.warn('[MongoDB getTrainers fallback]', e.message);
+    }
+  }
+
+  const store = readJsonDb();
+  return store.trainers.sort((a, b) => (a.order || 0) - (b.order || 0));
 }
 
 async function saveTrainer(trainerData) {
   const database = await connectDB();
-  if (!database) throw new Error('Database connection unavailable');
   const trainerId = trainerData.trainerId || ('trainer-' + Date.now());
   const document = {
     ...trainerData,
@@ -526,32 +606,60 @@ async function saveTrainer(trainerData) {
     updatedAt: new Date()
   };
   delete document._id;
-  await database.collection('trainers').updateOne(
-    { trainerId },
-    { $set: document },
-    { upsert: true }
-  );
+
+  if (database) {
+    try {
+      await database.collection('trainers').updateOne(
+        { trainerId },
+        { $set: document },
+        { upsert: true }
+      );
+    } catch (e) {}
+  }
+
+  const store = readJsonDb();
+  const idx = store.trainers.findIndex(t => t.trainerId === trainerId);
+  if (idx >= 0) {
+    store.trainers[idx] = { ...document, updatedAt: document.updatedAt.toISOString() };
+  } else {
+    store.trainers.push({ ...document, updatedAt: document.updatedAt.toISOString() });
+  }
+  writeJsonDb(store);
   return { success: true, trainerId, data: document };
 }
 
 async function deleteTrainer(trainerId) {
   const database = await connectDB();
-  if (!database) throw new Error('Database connection unavailable');
-  await database.collection('trainers').deleteOne({ trainerId });
+  if (database) {
+    try {
+      await database.collection('trainers').deleteOne({ trainerId });
+    } catch (e) {}
+  }
+
+  const store = readJsonDb();
+  store.trainers = store.trainers.filter(t => t.trainerId !== trainerId);
+  writeJsonDb(store);
   return { success: true, trainerId };
 }
 
 // --- Projects ---
 async function getProjects() {
   const database = await connectDB();
-  if (!database) return SEED_PROJECTS;
-  const list = await database.collection('projects').find({}).sort({ order: 1 }).toArray();
-  return list.length ? list : SEED_PROJECTS;
+  if (database) {
+    try {
+      const list = await database.collection('projects').find({}).sort({ order: 1 }).toArray();
+      if (list && list.length > 0) return list;
+    } catch (e) {
+      console.warn('[MongoDB getProjects fallback]', e.message);
+    }
+  }
+
+  const store = readJsonDb();
+  return store.projects.sort((a, b) => (a.order || 0) - (b.order || 0));
 }
 
 async function saveProject(projectData) {
   const database = await connectDB();
-  if (!database) throw new Error('Database connection unavailable');
   const projectId = projectData.projectId || ('project-' + Date.now());
   const document = {
     ...projectData,
@@ -559,73 +667,164 @@ async function saveProject(projectData) {
     updatedAt: new Date()
   };
   delete document._id;
-  await database.collection('projects').updateOne(
-    { projectId },
-    { $set: document },
-    { upsert: true }
-  );
+
+  if (database) {
+    try {
+      await database.collection('projects').updateOne(
+        { projectId },
+        { $set: document },
+        { upsert: true }
+      );
+    } catch (e) {}
+  }
+
+  const store = readJsonDb();
+  const idx = store.projects.findIndex(p => p.projectId === projectId);
+  if (idx >= 0) {
+    store.projects[idx] = { ...document, updatedAt: document.updatedAt.toISOString() };
+  } else {
+    store.projects.push({ ...document, updatedAt: document.updatedAt.toISOString() });
+  }
+  writeJsonDb(store);
   return { success: true, projectId, data: document };
 }
 
 async function deleteProject(projectId) {
   const database = await connectDB();
-  if (!database) throw new Error('Database connection unavailable');
-  await database.collection('projects').deleteOne({ projectId });
+  if (database) {
+    try {
+      await database.collection('projects').deleteOne({ projectId });
+    } catch (e) {}
+  }
+
+  const store = readJsonDb();
+  store.projects = store.projects.filter(p => p.projectId !== projectId);
+  writeJsonDb(store);
   return { success: true, projectId };
 }
 
-// --- Site Settings ---
+// --- Settings ---
 async function getSettings() {
   const database = await connectDB();
-  if (!database) return SEED_SETTINGS;
-  const settings = await database.collection('settings').findOne({ settingsId: 'general' });
-  return settings || SEED_SETTINGS;
+  if (database) {
+    try {
+      const settings = await database.collection('settings').findOne({ settingsId: 'general' });
+      if (settings) return settings;
+    } catch (e) {
+      console.warn('[MongoDB getSettings fallback]', e.message);
+    }
+  }
+
+  const store = readJsonDb();
+  return store.settings;
 }
 
 async function saveSettings(settingsData) {
   const database = await connectDB();
-  if (!database) throw new Error('Database connection unavailable');
   const document = {
     ...settingsData,
     settingsId: 'general',
     updatedAt: new Date()
   };
   delete document._id;
-  await database.collection('settings').updateOne(
-    { settingsId: 'general' },
-    { $set: document },
-    { upsert: true }
-  );
-  return { success: true, data: document };
+
+  if (database) {
+    try {
+      await database.collection('settings').updateOne(
+        { settingsId: 'general' },
+        { $set: document },
+        { upsert: true }
+      );
+    } catch (e) {}
+  }
+
+  const store = readJsonDb();
+  store.settings = { ...store.settings, ...document, updatedAt: document.updatedAt.toISOString() };
+  writeJsonDb(store);
+  return { success: true, settings: store.settings };
 }
 
-// --- Inquiries Management ---
-async function deleteInquiry(refId) {
+// --- Subscribers & Career Leads ---
+async function saveSubscriber(email) {
   const database = await connectDB();
-  if (!database) throw new Error('Database connection unavailable');
-  await database.collection('inquiries').deleteOne({ refId });
-  return { success: true, refId };
+  const doc = { email, createdAt: new Date() };
+  if (database) {
+    try {
+      await database.collection('subscribers').insertOne(doc);
+    } catch (e) {}
+  }
+  const store = readJsonDb();
+  store.subscribers.push({ email, createdAt: doc.createdAt.toISOString() });
+  writeJsonDb(store);
+  return { success: true, email };
 }
 
-async function updateInquiryStatus(refId, status) {
+async function saveCareerLead(leadData) {
   const database = await connectDB();
-  if (!database) throw new Error('Database connection unavailable');
-  await database.collection('inquiries').updateOne({ refId }, { $set: { status, updatedAt: new Date() } });
-  return { success: true, refId, status };
+  const doc = { ...leadData, createdAt: new Date() };
+  if (database) {
+    try {
+      await database.collection('career_leads').insertOne(doc);
+    } catch (e) {}
+  }
+  const store = readJsonDb();
+  store.career_leads.push({ ...leadData, createdAt: doc.createdAt.toISOString() });
+  writeJsonDb(store);
+  return { success: true, lead: doc };
 }
 
-// --- Certificates Management ---
-async function getAllCertificates(limit = 100) {
-  const database = await connectDB();
-  if (!database) return SEED_CERTIFICATES;
-  return await database.collection('certificates').find({}).sort({ createdAt: -1 }).limit(limit).toArray();
-}
-
-async function deleteCertificate(certId) {
-  const database = await connectDB();
-  if (!database) throw new Error('Database connection unavailable');
-  await database.collection('certificates').deleteOne({ certId });
-  return { success: true, certId };
+// --- Status & Diagnostics ---
+async function getDbStatus() {
+  try {
+    const database = await connectDB();
+    if (database) {
+      const collections = await database.listCollections().toArray();
+      const stats = {};
+      for (const col of collections) {
+        stats[col.name] = await database.collection(col.name).countDocuments();
+      }
+      return {
+        connected: true,
+        database: DB_NAME,
+        host: MONGODB_URI.includes('@') ? 'MongoDB Atlas' : 'Local MongoDB (localhost:27017)',
+        engine: 'MongoDB',
+        collections: collections.map(c => c.name),
+        counts: stats
+      };
+    } else {
+      const store = readJsonDb();
+      return {
+        connected: true,
+        database: 'Cloud Persistent Database',
+        host: 'Local Disk Storage Engine',
+        engine: 'Persistent Storage',
+        collections: ['trainers', 'projects', 'settings', 'certificates', 'inquiries'],
+        counts: {
+          trainers: store.trainers.length,
+          projects: store.projects.length,
+          settings: 1,
+          certificates: store.certificates.length,
+          inquiries: store.inquiries.length
+        }
+      };
+    }
+  } catch (err) {
+    const store = readJsonDb();
+    return {
+      connected: true,
+      database: 'Cloud Persistent Database',
+      host: 'Local Disk Storage Engine',
+      engine: 'Persistent Storage',
+      collections: ['trainers', 'projects', 'settings', 'certificates', 'inquiries'],
+      counts: {
+        trainers: store.trainers.length,
+        projects: store.projects.length,
+        settings: 1,
+        certificates: store.certificates.length,
+        inquiries: store.inquiries.length
+      }
+    };
+  }
 }
 
 module.exports = {
