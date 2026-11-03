@@ -1,0 +1,24 @@
+name: Keep Render Web Service Alive
+
+on:
+  schedule:
+    # Runs every 10 minutes to prevent Render free-tier spin-down
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping AR Infotech API
+        run: |
+          echo "Pinging https://arinfo-tech.onrender.com/api/status ..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://arinfo-tech.onrender.com/api/status)
+          echo "HTTP Response: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "Server is awake and responding!"
+          else
+            echo "Server returned $HTTP_STATUS, retrying in 5 seconds..."
+            sleep 5
+            curl -s https://arinfo-tech.onrender.com/api/status
+          fi
