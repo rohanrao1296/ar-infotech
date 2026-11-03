@@ -655,14 +655,14 @@
         Authenticate to manage faculty framing, live projects, admissions CRM, and certificate registry.
       </p>
 
-      <form id="login-form">
+      <form id="login-form" autocomplete="off">
         <div class="form-group">
           <label class="form-label">Username</label>
-          <input type="text" id="login-user" class="form-control" placeholder="admin" required value="admin">
+          <input type="text" id="login-user" class="form-control" placeholder="Enter admin username" required autocomplete="off" value="">
         </div>
         <div class="form-group">
           <label class="form-label">Admin Secret Password</label>
-          <input type="password" id="login-pass" class="form-control" placeholder="••••••••••••" required value="admin@arinfotech2026">
+          <input type="password" id="login-pass" class="form-control" placeholder="Enter password" required autocomplete="new-password" value="">
         </div>
         <div id="login-error" style="color: var(--danger); font-size: 0.82rem; font-weight: 700; margin-bottom: 1rem; display: none;"></div>
         <button type="submit" class="btn btn-primary" id="login-btn" style="width: 100%;">
@@ -1471,15 +1471,15 @@
         .replace(/'/g, '&#39;');
     }
 
-    // State
-    let authToken = localStorage.getItem('ar_admin_token') || '';
+    // State: In-Memory / Session Only (No Auto-Login)
+    let authToken = '';
     let currentTrainers = [];
     let currentProjects = [];
     let currentSettings = {};
 
     // Helper: Authenticated fetch passing Authorization Bearer header
     function authFetch(url, options = {}) {
-      const token = localStorage.getItem('ar_admin_token') || authToken;
+      const token = sessionStorage.getItem('ar_admin_token') || authToken;
       const headers = { ...(options.headers || {}) };
       if (token) {
         headers['Authorization'] = 'Bearer ' + token;
@@ -1489,31 +1489,28 @@
 
     // Helper: Safely resolve current user and role
     function getCurrentUser() {
-      // 1. Try reading from localStorage
       try {
-        const raw = localStorage.getItem('ar_admin_user');
+        const raw = sessionStorage.getItem('ar_admin_user');
         if (raw) {
           const u = JSON.parse(raw);
           if (u && u.username && u.role) return u;
         }
       } catch (e) {}
 
-      // 2. Fallback: decode directly from authToken (AR_AUTH_<base64>)
       try {
-        const tok = localStorage.getItem('ar_admin_token') || authToken;
+        const tok = sessionStorage.getItem('ar_admin_token') || authToken;
         if (tok && tok.startsWith('AR_AUTH_')) {
           const b64 = tok.replace('AR_AUTH_', '');
           const str = atob(b64);
           const parts = str.split(':');
           if (parts.length >= 2) {
             const u = { username: parts[0], role: parts[1].toLowerCase(), name: parts[0] };
-            localStorage.setItem('ar_admin_user', JSON.stringify(u));
+            sessionStorage.setItem('ar_admin_user', JSON.stringify(u));
             return u;
           }
         }
       } catch (e) {}
 
-      // 3. Safe fallback: Restricted admin, NEVER superadmin
       return { username: 'staff', role: 'admin', name: 'Staff Admin' };
     }
 
@@ -1529,15 +1526,25 @@
       }
     }
 
-    // Initialization
+    // Initialization: Strict Security - NEVER AUTO LOGIN ON PAGE LOAD
     window.addEventListener('DOMContentLoaded', () => {
-      if (authToken) {
+      // Clear any legacy persistent tokens
+      localStorage.removeItem('ar_admin_token');
+      localStorage.removeItem('ar_admin_user');
+
+      // Check if active tab session exists
+      const activeSessionToken = sessionStorage.getItem('ar_admin_token');
+      const activeSessionUser = sessionStorage.getItem('ar_admin_user');
+
+      if (activeSessionToken && activeSessionUser) {
+        authToken = activeSessionToken;
         showAdminApp();
       } else {
+        authToken = '';
         showLoginView();
       }
 
-      // Check DB Status
+      // Check DB Status in background
       fetch('/api/status')
         .then(r => r.json())
         .then(data => {
@@ -1553,14 +1560,25 @@
         });
     });
 
-    // Login Form Handler
+    // Login Form Handler: Explicit Credentials Required
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const user = document.getElementById('login-user').value.trim();
       const pass = document.getElementById('login-pass').value.trim();
       const errBox = document.getElementById('login-error');
+      const loginBtn = document.getElementById('login-btn');
 
       errBox.style.display = 'none';
+      errBox.innerText = '';
+
+      if (!user || !pass) {
+        errBox.innerText = 'Please enter both username and password';
+        errBox.style.display = 'block';
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<span>⏳ Authenticating...</span>';
 
       try {
         const res = await fetch('/api/admin/login', {
@@ -1569,32 +1587,49 @@
           body: JSON.stringify({ username: user, password: pass })
         });
         const data = await res.json();
-        if (data.success && data.token) {
+        if (data.success && data.token && data.user) {
           authToken = data.token;
-          localStorage.setItem('ar_admin_token', authToken);
-          if (data.user) {
-            localStorage.setItem('ar_admin_user', JSON.stringify(data.user));
-          } else {
-            // Decode role from token if user object missing
-            getCurrentUser();
-          }
+          sessionStorage.setItem('ar_admin_token', authToken);
+          sessionStorage.setItem('ar_admin_user', JSON.stringify(data.user));
+          
+          // Clear inputs after successful authentication
+          document.getElementById('login-user').value = '';
+          document.getElementById('login-pass').value = '';
+
           showAdminApp();
-          const userObj = getCurrentUser();
+          const userObj = data.user;
           const isSuper = (userObj.role === 'superadmin');
           showToast('Welcome, ' + (userObj.name || userObj.username) + ' (' + (isSuper ? 'Super Admin' : 'Staff Admin') + ')');
         } else {
-          errBox.innerText = data.error || 'Invalid credentials';
+          errBox.innerText = data.error || 'Incorrect username or password. Access denied.';
           errBox.style.display = 'block';
         }
       } catch (err) {
         errBox.innerText = 'Network error: ' + err.message;
         errBox.style.display = 'block';
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<span>🔐 Authenticate &amp; Launch Portal</span>';
       }
     });
 
     function showLoginView() {
       document.getElementById('login-view').style.display = 'flex';
       document.getElementById('admin-app').style.display = 'none';
+
+      const uInp = document.getElementById('login-user');
+      const pInp = document.getElementById('login-pass');
+      if (uInp) uInp.value = '';
+      if (pInp) pInp.value = '';
+
+      const errBox = document.getElementById('login-error');
+      if (errBox) { errBox.style.display = 'none'; errBox.innerText = ''; }
+
+      const loginBtn = document.getElementById('login-btn');
+      if (loginBtn) {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<span>🔐 Authenticate &amp; Launch Portal</span>';
+      }
     }
 
     function showAdminApp() {
@@ -1663,10 +1698,12 @@
 
     function logoutAdmin() {
       authToken = '';
+      sessionStorage.removeItem('ar_admin_token');
+      sessionStorage.removeItem('ar_admin_user');
       localStorage.removeItem('ar_admin_token');
       localStorage.removeItem('ar_admin_user');
       showLoginView();
-      showToast('Logged out successfully');
+      showToast('Logged out securely');
     }
 
     // Switch Sidebar Tab with Strict RBAC Lock
