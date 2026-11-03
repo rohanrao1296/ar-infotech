@@ -3546,3 +3546,234 @@ textarea.form-control {
     padding: 1.15rem 0.75rem;
   }
 }
+
+/* ==========================================================================
+   OFFICIAL GOVERNMENT RECOGNITIONS & ACCREDITATIONS
+   ========================================================================== */
+.trust-recognitions-section {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  padding: 3.5rem 0 4rem 0;
+  border-bottom: 1px solid var(--border-light);
+  position: relative;
+}
+
+.trust-recognitions-header {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 2.75rem auto;
+}
+
+.trust-pill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(0, 82, 204, 0.08);
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 0.38rem 0.95rem;
+  border-radius: var(--radius-full);
+  margin-bottom: 0.75rem;
+  border: 1px solid rgba(0, 82, 204, 0.2);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.trust-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 3.2vw, 2.25rem);
+  font-weight: 800;
+  color: var(--text-heading);
+  margin-bottom: 0.6rem;
+  letter-spacing: -0.02em;
+}
+
+.trust-subheading {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.trust-recognitions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 1.85rem;
+}
+
+.trust-card {
+  background: #ffffff;
+  border: 1.5px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 2.2rem 1.6rem 1.8rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+  transition: all var(--transition-normal);
+}
+
+.trust-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 82, 204, 0.12);
+  border-color: rgba(0, 82, 204, 0.35);
+}
+
+.trust-card-badge {
+  position: absolute;
+  top: -12px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  background: var(--gradient-brand);
+  color: #ffffff;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  box-shadow: 0 3px 8px rgba(0, 82, 204, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.trust-logo-box {
+  height: 85px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.35rem;
+  padding: 0.4rem;
+}
+
+.trust-logo-img {
+  max-height: 100%;
+  max-width: 220px;
+  width: auto;
+  object-fit: contain;
+  transition: transform var(--transition-fast);
+}
+
+.trust-card:hover .trust-logo-img {
+  transform: scale(1.05);
+}
+
+.trust-card-title {
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: var(--text-heading);
+  margin-bottom: 0.45rem;
+}
+
+.trust-card-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.trust-card-footer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--success);
+  background: rgba(16, 185, 129, 0.08);
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.trust-check-icon {
+  font-size: 0.85rem;
+  font-weight: 900;
+}
+
+/* Certificate Endorsement Badges */
+.cert-accreditation-row {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.cert-acc-title {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.85rem;
+}
+
+.cert-acc-badges {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cert-acc-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.cert-acc-item img {
+  height: 24px;
+  max-width: 60px;
+  object-fit: contain;
+}
+
+/* Footer Recognitions Bar */
+.footer-recognitions-bar {
+  padding: 1.75rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 2rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.footer-rec-label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.footer-rec-list {
+  display: flex;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.footer-rec-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #0f172a;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.footer-rec-card img {
+  height: 24px;
+  max-width: 65px;
+  object-fit: contain;
+}
