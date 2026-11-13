@@ -1346,10 +1346,17 @@ function renderDynamicProjects(projects) {
             <span class="credit-author">Lead Architect: <strong>${p.author || 'Rohan Kumar'}</strong></span>
           </div>
           ${p.liveUrl ? `
-          <a href="${p.liveUrl}" target="_blank" rel="noopener noreferrer" class="project-live-btn">
+          <a href="${p.liveUrl}" target="_blank" rel="noopener noreferrer" class="project-live-btn ${p.projectId === 'pal-csc' || (p.type === 'mobile' && !p.liveUrl.includes('play.google.com')) || p.liveUrl.includes('.apk') || p.liveUrl.includes('drive.google') ? 'project-apk-btn' : ''}">
+            ${(p.projectId === 'pal-csc' || (p.type === 'mobile' && !p.liveUrl.includes('play.google.com')) || p.liveUrl.includes('.apk')) ? `
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993s-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993s-.4482.9997-.9993.9997m11.4045-6.02l1.996-3.4567c.1356-.2348.0551-.536-.1797-.6715-.2348-.1356-.536-.0551-.6716.1797l-2.0284 3.5127c-1.5794-.7203-3.3444-1.1215-5.2018-1.1215-1.8575 0-3.6224.4012-5.2018 1.1215L4.5678 5.373c-.1356-.2348-.4368-.3153-.6716-.1797-.2348.1356-.3153.4367-.1797.6715L5.7125 9.3214C2.3884 11.134 0 14.6548 0 18.7303h24c0-4.0755-2.3884-7.5963-5.7125-9.4089"/></svg>
+            <span>📥 Download Android APK</span>` : `
             <span>🚀 Open Live Web App</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-          </a>` : ''}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`}
+          </a>` : (p.projectId === 'pal-csc' ? `
+          <a href="#" target="_blank" rel="noopener noreferrer" class="project-live-btn project-apk-btn" onclick="alert('Pal Jan Sewa Kendra APK file upload ho rahi hai. Download link jald live hoga!'); return false;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align: -2px; margin-right: 4px;"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993s-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993s-.4482.9997-.9993.9997m11.4045-6.02l1.996-3.4567c.1356-.2348.0551-.536-.1797-.6715-.2348-.1356-.536-.0551-.6716.1797l-2.0284 3.5127c-1.5794-.7203-3.3444-1.1215-5.2018-1.1215-1.8575 0-3.6224.4012-5.2018 1.1215L4.5678 5.373c-.1356-.2348-.4368-.3153-.6716-.1797-.2348.1356-.3153.4367-.1797.6715L5.7125 9.3214C2.3884 11.134 0 14.6548 0 18.7303h24c0-4.0755-2.3884-7.5963-5.7125-9.4089"/></svg>
+            <span>📥 Download Android APK</span>
+          </a>` : '')}
         </div>
       </div>
     `;
