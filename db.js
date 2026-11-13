@@ -206,7 +206,7 @@ const SEED_PROJECTS = [
     author: 'AR Infotech',
     iconImage: './assets/images/app-pal-csc-screens.png',
     previewImage: './assets/images/app-pal-csc-screens.png',
-    liveUrl: '',
+    liveUrl: '/assets/downloads/pal-csc.apk',
     order: 3
   },
   {
