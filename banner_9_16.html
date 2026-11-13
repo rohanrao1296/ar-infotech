@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080, height=1920, initial-scale=1.0">
+  <title>AR INFOTECH - Official 9:16 Shop Standee Banner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background-color: #050a18;
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', -apple-system, sans-serif;
+      color: #ffffff;
+      position: relative;
+    }
+
+    /* 9:16 Canvas Frame */
+    .banner-canvas {
+      width: 1080px;
+      height: 1920px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 56px 44px 56px;
+    }
+
+    /* Background: Website Front Page with Luxury Dark-Tech Overlays */
+    .bg-site-preview {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('./assets/images/site-frontpage-preview.png');
+      background-size: cover;
+      background-position: top center;
+      filter: blur(4px) brightness(0.28) saturate(1.4);
+      transform: scale(1.05);
+      z-index: 0;
+    }
+
+    .bg-gradient-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 12%, rgba(6, 84, 210, 0.45) 0%, rgba(10, 18, 42, 0.88) 45%, rgba(4, 8, 20, 0.98) 100%);
+      z-index: 1;
+    }
+
+    /* Futuristic glowing tech circles in background */
+    .glow-circle-1 {
+      position: absolute;
+      top: 220px;
+      right: -100px;
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.25) 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .glow-circle-2 {
+      position: absolute;
+      bottom: 300px;
+      left: -120px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .banner-content {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ==========================================================================
+       1. HEADER ROW: GOVT RECOGNITION BADGES
+       ========================================================================== */
+    .header-trust-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 14px 28px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .trust-label {
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .trust-label .flag-dot {
+      width: 10px;
+      height: 10px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+    }
+
+    .trust-logos-row {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .trust-logo-pill {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .trust-logo-pill img {
+      height: 28px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* ==========================================================================
+       2. BRAND HERO CARD
+       ========================================================================== */
+    .brand-hero-block {
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 22px;
+    }
+
+    .brand-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 26px;
+      padding: 14px 28px;
+      box-shadow: 0 16px 40px rgba(6, 84, 210, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      margin-bottom: 14px;
+      gap: 16px;
+    }
+
+    .brand-logo-img {
+      height: 60px;
+      width: auto;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+    }
+
+    .brand-logo-text {
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 30%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+
+    .brand-main-title {
+      font-size: 58px;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      line-height: 1.15;
+      margin-bottom: 10px;
+      text-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
+    }
+
+    .brand-main-title .gradient-text {
+      background: linear-gradient(135deg, #38bdf8 0%, #0654D2 50%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-sub-tagline {
+      font-size: 20px;
+      font-weight: 600;
+      color: #cbd5e1;
+      max-width: 820px;
+      margin: 0 auto 16px auto;
+      line-height: 1.4;
+    }
+
+    .announcement-ribbon {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(90deg, rgba(234, 88, 12, 0.25) 0%, rgba(249, 115, 22, 0.15) 100%);
+      border: 1px solid rgba(249, 115, 22, 0.45);
+      border-radius: 999px;
+      padding: 8px 24px;
+      font-size: 17px;
+      font-weight: 800;
+      color: #ffedd5;
+      box-shadow: 0 4px 18px rgba(234, 88, 12, 0.25);
+    }
+
+    .announcement-ribbon .fire-icon {
+      font-size: 20px;
+    }
+
+    /* ==========================================================================
+       3. SERVICES & COURSES GRID (HIGH IMPACT TILES)
+       ========================================================================== */
+    .services-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Section A: IT Training Courses */
+    .service-card-primary {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.55) 100%);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(56, 189, 248, 0.3);
+      border-radius: 22px;
+      padding: 22px 26px;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #0284c7, #38bdf8, #818cf8);
+    }
+
+    .card-head-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+    }
+
+    .card-main-heading {
+      font-size: 23px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+    }
+
+    .card-badge-pill {
+      font-size: 13px;
+      font-weight: 800;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38bdf8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .courses-pills-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .course-mini-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .course-bullet {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #38bdf8;
+      flex-shrink: 0;
+      box-shadow: 0 0 8px #38bdf8;
+    }
+
+    .course-name-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f1f5f9;
+      line-height: 1.25;
+    }
+
+    .course-sub-meta {
+      font-size: 12px;
+      font-weight: 500;
+      color: #94a3b8;
+    }
+
+    /* Section B: Dual Split - Software Dev & Pal Jan Sewa Kendra */
+    .dual-split-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .sub-service-card {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.55) 100%);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .sub-service-card.green-theme {
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+
+    .sub-service-card.green-theme::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #10b981, #34d399);
+    }
+
+    .sub-card-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sub-card-title span.emoji {
+      font-size: 20px;
+    }
+
+    .sub-card-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .sub-card-list li {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sub-card-list li::before {
+      content: '✔';
+      font-size: 12px;
+      color: #38bdf8;
+      font-weight: 900;
+    }
+
+    .sub-service-card.green-theme .sub-card-list li::before {
+      color: #34d399;
+    }
+
+    .csc-badge-row {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      color: #34d399;
+    }
+
+    /* ==========================================================================
+       4. DUAL QR CODE SHOWCASE (SCAN & EXPLORE / DOWNLOAD)
+       ========================================================================== */
+    .qr-showcase-box {
+      background: linear-gradient(135deg, rgba(6, 84, 210, 0.22) 0%, rgba(15, 23, 42, 0.85) 100%);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(56, 189, 248, 0.35);
+      border-radius: 26px;
+      padding: 24px 28px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .qr-box-header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .qr-box-header h3 {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.3px;
+      color: #ffffff;
+    }
+
+    .qr-box-header p {
+      font-size: 15px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    .qr-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+
+    .qr-single-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .qr-single-card.app-card {
+      border-color: rgba(52, 211, 153, 0.35);
+      background: rgba(16, 185, 129, 0.06);
+    }
+
+    .qr-image-frame {
+      width: 170px;
+      height: 170px;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      margin-bottom: 14px;
+    }
+
+    .qr-image-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .qr-title-text {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .qr-desc-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+
+    .qr-action-pill {
+      font-size: 12px;
+      font-weight: 800;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: #0284c7;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.4);
+    }
+
+    .qr-single-card.app-card .qr-action-pill {
+      background: #059669;
+      box-shadow: 0 4px 10px rgba(5, 150, 105, 0.4);
+    }
+
+    /* ==========================================================================
+       5. FOOTER CONTACT STRIP
+       ========================================================================== */
+    .banner-footer {
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .footer-col {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .footer-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #38bdf8;
+    }
+
+    .footer-value {
+      font-size: 17px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.2px;
+    }
+
+    .footer-sep {
+      width: 1px;
+      height: 38px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .footer-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 6px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="banner-canvas">
+    <!-- Background Layers -->
+    <div class="bg-site-preview"></div>
+    <div class="bg-gradient-overlay"></div>
+    <div class="glow-circle-1"></div>
+    <div class="glow-circle-2"></div>
+
+    <!-- Main Content Flow -->
+    <div class="banner-content">
+
+      <!-- 1. HEADER: GOVT BADGES & ACCREDITATION -->
+      <div class="header-trust-bar">
+        <div class="trust-label">
+          <span class="flag-dot"></span>
+          Govt. of India Recognized
+        </div>
+        <div class="trust-logos-row">
+          <div class="trust-logo-pill" title="Ministry of MSME">
+            <img src="./assets/images/msme-gov.png" alt="MSME Govt of India">
+          </div>
+          <div class="trust-logo-pill" title="Digital India Power to Empower">
+            <img src="./assets/images/digital-india.png" alt="Digital India">
+          </div>
+          <div class="trust-logo-pill" title="Income Tax Department Govt of India">
+            <img src="./assets/images/income-tax-dept.png" alt="Income Tax Dept">
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. BRAND HERO CARD -->
+      <div class="brand-hero-block">
+        <div class="brand-logo-wrap">
+          <img src="./assets/images/logo.png" alt="AR INFOTECH Logo" class="brand-logo-img">
+          <span class="brand-logo-text">AR INFOTECH</span>
+        </div>
+        <h1 class="brand-main-title">
+          Shape Your Career in <br>
+          <span class="gradient-text">Software & IT Engineering</span>
+        </h1>
+        <p class="brand-sub-tagline">
+          Govt. Registered Institute of Coding, Professional Software Architecture &amp; Citizen Digital E-Governance Services.
+        </p>
+        <div class="announcement-ribbon">
+          <span class="fire-icon">🔥</span>
+          <span>New Admissions Open 2026 • Flat ₹1,199 Offer • 100% Practical Training</span>
+        </div>
+      </div>
+
+      <!-- 3. SERVICES TILES -->
+      <div class="services-container">
+
+        <!-- Card A: IT Masterclasses -->
+        <div class="service-card-primary">
+          <div class="card-head-row">
+            <div class="card-title-group">
+              <div class="card-icon-box">🎓</div>
+              <div>
+                <h2 class="card-main-heading">Job-Ready IT &amp; Coding Masterclasses</h2>
+                <span style="font-size: 13px; color: #94a3b8; font-weight: 600;">With Official Verifiable Government Recognized Certificate</span>
+              </div>
+            </div>
+            <span class="card-badge-pill">Live Project Batches</span>
+          </div>
+
+          <div class="courses-pills-grid">
+            <div class="course-mini-item">
+              <span class="course-bullet"></span>
+              <div>
+                <div class="course-name-text">Full Stack Web Development</div>
+                <div class="course-sub-meta">React.js, Node.js, Express, MongoDB</div>
+              </div>
+            </div>
+            <div class="course-mini-item">
+              <span class="course-bullet"></span>
+              <div>
+                <div class="course-name-text">Flutter &amp; Dart App Dev</div>
+                <div class="course-sub-meta">Android, iOS, Firebase Cloud</div>
+              </div>
+            </div>
+            <div class="course-mini-item">
+              <span class="course-bullet"></span>
+              <div>
+                <div class="course-name-text">Cyber Security &amp; VAPT</div>
+                <div class="course-sub-meta">Ethical Hacking, Network Defense</div>
+              </div>
+            </div>
+            <div class="course-mini-item">
+              <span class="course-bullet"></span>
+              <div>
+                <div class="course-name-text">Python &amp; AI Essentials</div>
+                <div class="course-sub-meta">Backend APIs, Automation &amp; Data</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card B: Dual Split (Software Development + Pal Jan Sewa Kendra) -->
+        <div class="dual-split-row">
+
+          <!-- Left: Software Studio -->
+          <div class="sub-service-card">
+            <div>
+              <div class="sub-card-title">
+                <span class="emoji">💻</span>
+                <span>Software Studio</span>
+              </div>
+              <ul class="sub-card-list">
+                <li>Custom Web Portals &amp; SaaS</li>
+                <li>School &amp; College ERP Systems</li>
+                <li>Diagnostic &amp; Hospital Management</li>
+                <li>Play Store / App Store Deployment</li>
+              </ul>
+            </div>
+            <div style="margin-top: 10px; font-size: 12px; font-weight: 700; color: #38bdf8;">
+              ✦ Engineered by AR Infotech
+            </div>
+          </div>
+
+          <!-- Right: Pal Jan Sewa Kendra -->
+          <div class="sub-service-card green-theme">
+            <div>
+              <div class="sub-card-title">
+                <span class="emoji">🏛️</span>
+                <span>Pal Jan Sewa Kendra</span>
+              </div>
+              <ul class="sub-card-list">
+                <li>आय, जाति, निवास प्रमाण पत्र</li>
+                <li>Instant PAN Card &amp; Correction</li>
+                <li>State Pension &amp; Scholarship</li>
+                <li>100% Safe Citizen Digital Services</li>
+              </ul>
+            </div>
+            <div class="csc-badge-row">
+              <span>CSC ID: 246253160019</span>
+              <span>VLE Vineet Pal</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- 4. DUAL QR CODE SHOWCASE -->
+      <div class="qr-showcase-box">
+        <div class="qr-box-header">
+          <h3>📱 Scan QR Codes to Connect Instantly</h3>
+          <p>Scan with your Phone Camera or Google Lens for Instant Access</p>
+        </div>
+
+        <div class="qr-cards-grid">
+          <!-- QR 1: Website -->
+          <div class="qr-single-card">
+            <div class="qr-image-frame">
+              <img src="./assets/images/qr-website.png" alt="Official Website QR Code">
+            </div>
+            <div class="qr-title-text">🌐 Official Website</div>
+            <div class="qr-desc-text">Courses, Admissions, Demo Class &amp; Certificate Registry</div>
+            <span class="qr-action-pill">Scan to Visit</span>
+          </div>
+
+          <!-- QR 2: Android App -->
+          <div class="qr-single-card app-card">
+            <div class="qr-image-frame">
+              <img src="./assets/images/qr-pal-csc-apk.png" alt="Pal Jan Sewa Kendra APK QR Code">
+            </div>
+            <div class="qr-title-text">📥 Download Mobile App</div>
+            <div class="qr-desc-text">Pal Jan Sewa Kendra Citizen Android APK (v1.0 Release)</div>
+            <span class="qr-action-pill">Scan to Download</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. FOOTER: CONTACT & LOCATION -->
+      <div class="banner-footer">
+        <div class="footer-col">
+          <span class="footer-label">📞 Helpline &amp; WhatsApp</span>
+          <span class="footer-value">+91 91615 03476 | +91 91255 78979</span>
+        </div>
+
+        <div class="footer-sep"></div>
+
+        <div class="footer-col">
+          <span class="footer-label">📍 Training Center &amp; Office</span>
+          <span class="footer-value">Rani Pokhra, Basti (Uttar Pradesh)</span>
+        </div>
+
+        <div class="footer-sep"></div>
+
+        <div class="footer-col">
+          <span class="footer-label">🌐 Web Portal</span>
+          <span class="footer-value" style="color: #38bdf8;">arinfo-tech.onrender.com</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
