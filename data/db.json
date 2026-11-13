@@ -168,10 +168,10 @@
     },
     {
       "projectId": "pal-csc",
-      "author": "AR Infotech",
+      "author": "Rohan Kumar",
       "badgeClass": "badge-cyan",
       "categoryBadge": "Flutter 3.x • Citizen Portal",
-      "company": "Pal Jan Sewa Kendra (CSC VLE Vineet Pal, Basti U.P.)",
+      "company": "AR Infotech",
       "desc": "A cross-platform Flutter mobile application engineered for Pal Jan Sewa Kendra (CSC ID: 246253160019, Basti, U.P.). Empowers rural and semi-urban citizens with digital applications for Income, Caste & Domicile certificates (आय, जाति, निवास प्रमाण पत्र), instant PAN Card issuance, state pension & scholarship scheme tracking, and secure digital fee payments.",
       "iconImage": "./assets/images/app-pal-csc-screens.png",
       "liveUrl": "/assets/downloads/pal-csc.apk",
@@ -187,7 +187,7 @@
       ],
       "title": "Pal Jan Sewa Kendra: Citizen Service Mobile App",
       "type": "mobile",
-      "updatedAt": "2026-11-13T14:02:10.196Z"
+      "updatedAt": "2026-11-13T14:24:49.333Z"
     }
   ],
   "settings": {
