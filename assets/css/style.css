@@ -1749,6 +1749,11 @@ ul, ol {
   color: #ffffff;
 }
 
+.pal-csc-banner {
+  background: linear-gradient(135deg, #0b192c 0%, #1e3a5f 50%, #0f2744 100%);
+  color: #ffffff;
+}
+
 .app-mockup-content {
   display: flex;
   align-items: center;

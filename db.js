@@ -195,6 +195,21 @@ const SEED_PROJECTS = [
     order: 2
   },
   {
+    projectId: 'pal-csc',
+    title: 'Pal Jan Sewa Kendra: Citizen Service Mobile App',
+    categoryBadge: 'Flutter 3.x • Citizen Portal',
+    badgeClass: 'badge-cyan',
+    type: 'mobile',
+    desc: 'A cross-platform Flutter mobile application engineered for Pal Jan Sewa Kendra (CSC ID: 246253160019, Basti, U.P.). Empowers rural and semi-urban citizens with digital applications for Income, Caste & Domicile certificates (आय, जाति, निवास प्रमाण पत्र), instant PAN Card issuance, state pension & scholarship scheme tracking, and secure digital fee payments.',
+    techTags: ['Flutter 3.x', 'Dart', 'Citizen Services', 'Payment Gateway', 'CSC e-Governance', 'Cross-Platform App'],
+    company: 'Pal Jan Sewa Kendra (CSC VLE Vineet Pal, Basti U.P.)',
+    author: 'AR Infotech',
+    iconImage: './assets/images/app-pal-csc-screens.png',
+    previewImage: './assets/images/app-pal-csc-screens.png',
+    liveUrl: '',
+    order: 3
+  },
+  {
     projectId: 'svv-erp',
     title: 'Savitri Vidya Vihar ERP: School Management & Attendance',
     categoryBadge: 'Full Stack ERP',
@@ -207,7 +222,7 @@ const SEED_PROJECTS = [
     browserAddress: 'savitrividyavihar.edu.in/admin',
     previewImage: './assets/images/project-svv-erp.png',
     liveUrl: 'https://savitrividyavihar.edu.in',
-    order: 3
+    order: 4
   },
   {
     projectId: 'aakriti',
@@ -222,7 +237,7 @@ const SEED_PROJECTS = [
     browserAddress: 'aakriti-ultrasound.firebaseapp.com',
     previewImage: './assets/images/project-aakriti-preview.png',
     liveUrl: 'https://aakriti-ultrasound.firebaseapp.com/',
-    order: 4
+    order: 5
   },
   {
     projectId: 'urldoctor',
@@ -237,7 +252,7 @@ const SEED_PROJECTS = [
     terminalTitle: 'root@ROHAN: ~/urldoctor',
     previewImage: './assets/images/project-urldoctor.png',
     liveUrl: '',
-    order: 5
+    order: 6
   }
 ];
 

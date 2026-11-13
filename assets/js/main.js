@@ -1269,7 +1269,7 @@ function renderDynamicProjects(projects) {
     const badgeClass = p.badgeClass || 'badge-cyan';
 
     if (p.type === 'mobile') {
-      const bannerClass = p.projectId === 'xpense' ? 'xpense-banner' : 'tasknest-banner';
+      const bannerClass = p.projectId === 'xpense' ? 'xpense-banner' : (p.projectId === 'pal-csc' ? 'pal-csc-banner' : 'tasknest-banner');
       previewMarkup = `
         <div class="app-preview-banner ${bannerClass}">
           <span class="badge ${badgeClass} project-type-tag">
